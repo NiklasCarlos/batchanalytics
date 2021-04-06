@@ -37,7 +37,22 @@ metric_frequency <- function(activity_log_with_batches, act, res, type_of_batch,
   }
 }
 
+
+
 # Metric - Batch size
+
+#' Title
+#'
+#' @param activity_log_with_batches
+#' @param act
+#' @param res
+#' @param type_of_batch
+#' @param exclude_singletons
+#'
+#' @return
+#' @export
+#'
+#' @examples
 metric_batch_size <- function(activity_log_with_batches, act, res, type_of_batch, exclude_singletons = TRUE){
 
   # Select relevant activity instances

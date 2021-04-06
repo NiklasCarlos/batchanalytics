@@ -1,0 +1,50 @@
+---
+title: "Batch_Analytics_xes_example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Batch_Analytics_xes_example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+
+library(batchanalytics)
+library(bupaR)
+library(bamalog)
+
+```
+
+Load example eventlog from bupaR
+
+```{r}
+
+log <- patients
+
+head(log)
+
+```
+
+Detect Batching behaviour
+
+```{r}
+
+activity_log <- detect_batching_log(log, show_progress = F)
+
+head(activity_log)
+
+```
+
+analyse the batching behaviour
+
+```{r}
+
+```
+
