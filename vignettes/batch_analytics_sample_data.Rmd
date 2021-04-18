@@ -62,7 +62,57 @@ head(result_log)
 ```
 
 
-show metrics
+###batch processing metrics
+
+
+```{r}
+
+#evtl chunk löschen aber vorher auschecken
+# ausserdem metric test implementation example xes rmd testen unterer part bupaR testen
+
+##############################
+#Batch Processing metrics
+##############################
+
+class(result_log)
+
+as.data.frame(result_log)
+
+#das komma xx[,] hat gefehlt
+result_log[result_log$batch_number == "481",]
+
+#result_log %>% throughput_time(units = "hours")
+
+
+#https://www.bupar.net/subsetting.html#processing_time
+#https://github.com/ctreffe/r-space/wiki/datenzugriff
+
+#log % filter(nur batch) % process_time_ process_map(zeige die durchlaufzeiten mit und ohne batch)
+
+#erstelle event log nach mit wunschergebniss-> für bathch orienteieren an anderen event logs - BEDINGUNG FÜR BATCH NACHSCHAUEN
+
+```
+
+
+```{r}
+#test batch frequency
+
+
+metric_frequency(result_log, "Registration", "B", "concurrent", FALSE )
+```
+
+
+
+```{r}
+
+#test batch size
+#metric_frequency(result_log, "Registration", "r1", "concurrent", FALSE )
+
+metric_batch_size(result_log, "B", "WorkerB_#0", "concurrent", exclude_singletons = TRUE)
+
+```
+
+
 
 ```{r}
 # Metric - Activity duration
