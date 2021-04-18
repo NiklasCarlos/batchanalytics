@@ -1,6 +1,7 @@
 #Functions for Batch analytic one function per metric
 
 
+
 # Metric - Batch processing frequency
 #' Metric - Batch processing frequency
 #'
@@ -12,6 +13,8 @@
 #'
 #' @return
 #' @export
+#'
+#' @importFrom dplyr %>%
 #'
 #' @examples
 metric_frequency <- function(activity_log_with_batches, act, res, type_of_batch, relative = FALSE){
@@ -80,6 +83,8 @@ metric_batch_size <- function(activity_log_with_batches, act, res, type_of_batch
 }
 
 # Metric - Batch processing prevalence (number of cases contained in a batch)
+
+
 metric_prevalence <- function(activity_log_with_batches, act, res, type_of_batch, relative = FALSE){
 
   # Select relevant activity instances
@@ -99,7 +104,26 @@ metric_prevalence <- function(activity_log_with_batches, act, res, type_of_batch
 }
 
 # Metric - Activity duration
+
+#' Title
+#'
+#' @param activity_log_with_batches
+#' @param act
+#' @param res
+#' @param type_of_batch
+#'
+#' @return
+#' @export
+#'
+#' @importFrom dplyr filter
+#' @importFrom lubridate is.POSIXct
+#'
+#' @examples
 metric_activity_duration <- function(activity_log_with_batches, act, res, type_of_batch){
+
+
+  ####debugging
+  print("hello world11")
 
   # Select relevant activity instances
   ra_selection <- as.data.frame(activity_log_with_batches %>% filter(activity == act, resource == res))
@@ -140,6 +164,18 @@ metric_activity_duration <- function(activity_log_with_batches, act, res, type_o
 
 
 # Metric - Waiting time
+
+#' Title
+#'
+#' @param activity_log_with_batches
+#' @param act
+#' @param res
+#' @param type_of_batch
+#'
+#' @return
+#' @export
+#'
+#' @examples
 metric_waiting_time <- function(activity_log_with_batches, act, res, type_of_batch){
 
   # Select relevant activity instances
@@ -189,6 +225,16 @@ metric_waiting_time <- function(activity_log_with_batches, act, res, type_of_bat
 }
 
 # Metric - Number of concurrent cases
+#' Title
+#'
+#' @param activity_log_with_batches
+#' @param act
+#' @param res
+#'
+#' @return
+#' @export
+#'
+#' @examples
 metric_n_concurrent_cases <- function(activity_log_with_batches, act, res){
 
   # Select relevant activity instances that are in a concurrent batch
@@ -242,6 +288,7 @@ metric_n_concurrent_cases <- function(activity_log_with_batches, act, res){
 
 
 # Metric - Time overlap between concurrent cases
+
 metric_overlap_concurrent_cases <- function(activity_log_with_batches, act, res){
 
   # Select relevant activity instances that are in a concurrent batch

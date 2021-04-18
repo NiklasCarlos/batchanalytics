@@ -1,0 +1,76 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r setup}
+
+library(batchanalytics)
+library(bupaR)
+library(bamalog)
+
+```
+
+Load sample eventlog 
+
+
+```{r}
+
+csv = system.file("exdata", "sample_data_1.csv", package = "batchanalytics")
+
+csv_log = read.csv(csv)
+
+task_log <- csv_log
+
+
+```
+
+
+detect batching behaviour and create a task log
+
+```{r}
+
+
+# Create seq_tolerated_gap_list (gap of 0 seconds is allowed)
+seq_tolerated_gap_list <- seq_tolerated_gap_list_generator(task_log = task_log, 
+                                                           seq_tolerated_gap_value = 0)
+
+subsequence_list <- enumerate_subsequences(task_log, 0)
+# Use the following line for using frequent sequence mining instead
+# subsequence_list <- identify_frequent_sequences(task_log, 0)
+
+# Detect batching behavior
+result_log <- detect_batching(task_log = task_log,
+                             act_seq_tolerated_gap_list = seq_tolerated_gap_list,
+                             timestamp_format = "yyyy-mm-dd hh:mm:ss",
+                             numeric_timestamps = FALSE,
+                             log_and_model_based = TRUE,
+                             subsequence_list = subsequence_list,
+                             subsequence_type = "enum",
+                             # use `mine` to use frequence sequence mining
+                             # subsequence_type = "mine",
+                             within_case_seq_tolerated_gap = 0,
+                             between_cases_seq_tolerated_gap = 0,
+                             show_progress = F)
+```
+
+
+
+```{r}
+head(result_log)
+```
+
+
+show metrics
+
+```{r}
+# Metric - Activity duration
+metric_activity_duration(result_log, "B", "WorkerB_#0", "concurrent")
+
+
+
+```
+
+
+
