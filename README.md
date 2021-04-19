@@ -24,6 +24,23 @@ This is a basic example which shows you how to solve a common problem:
 
 ``` r
 library(batchanalytics)
+library(bupaR)
+#> Warning: package 'bupaR' was built under R version 4.0.4
+#> 
+#> Attaching package: 'bupaR'
+#> The following object is masked from 'package:stats':
+#> 
+#>     filter
+#> The following object is masked from 'package:utils':
+#> 
+#>     timestamp
+library(tidyr)
+library(lubridate)
+#> 
+#> Attaching package: 'lubridate'
+#> The following objects are masked from 'package:base':
+#> 
+#>     date, intersect, setdiff, union
 ## basic example code
 ```
 
@@ -31,14 +48,27 @@ What is special about using `README.Rmd` instead of just `README.md`?
 You can include R chunks like so:
 
 ``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
+csv_log = read.csv(system.file("exdata", "sample_data_1.csv", package = "batchanalytics"))
+
+#time converstion - why sometimes read correctly sometimes not?
+csv_log$arrival <- as.POSIXct(csv_log$arrival, format = "%Y-%m-%d %H:%M:%S", tz = "GMT") 
+csv_log$start <- as.POSIXct(csv_log$start, format = "%Y-%m-%d %H:%M:%S", tz = "GMT") 
+csv_log$complete <-  as.POSIXct(csv_log$complete, format = "%Y-%m-%d %H:%M:%S", tz = "GMT")
+
+
+
+#creating event_Log
+elog <- csv_log %>%
+    mutate(activity_instance = 1:nrow(.)) %>%
+    gather(status, timestamp, arrival, start, complete)  %>%
+    eventlog(
+        case_id = "case_id",
+        activity_id = "activity",
+        activity_instance_id = "instance_id",
+        lifecycle_id = "status",
+        timestamp = "timestamp",
+        resource_id = "resource"
+    )
 ```
 
 You’ll still need to render `README.Rmd` regularly, to keep `README.md`
@@ -49,7 +79,9 @@ example workflow can be found here:
 
 You can also embed plots, for example:
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
+    #> Warning: Removed 401 rows containing non-finite values (stat_boxplot).
+
+<img src="man/figures/README-processingTime-1.png" width="100%" />
 
 In that case, don’t forget to commit and push the resulting figure
 files, so they display on GitHub and CRAN.

@@ -9,7 +9,5 @@ NULL
 
 #' @import dplyr
 #' @import tidyr
-#' @import reshape
-#' @import lubridate
 #' @importFrom utils timestamp
 NULL

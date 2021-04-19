@@ -2,6 +2,13 @@
 
 
 
+
+metric_cycleTime <- function(event_log){
+
+}
+
+
+
 # Metric - Batch processing frequency
 #' Metric - Batch processing frequency
 #'

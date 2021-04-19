@@ -66,12 +66,50 @@ head(result_log)
 
 
 
+```{r}
+
+library(tidyr)
+
+log <- result_log %>%
+    mutate(activity_instance = 1:nrow(.)) %>%
+    gather(status, timestamp, arrival, start, complete)  %>%
+    eventlog(
+        case_id = "case_id",
+        activity_id = "activity",
+        activity_instance_id = "instance_id",
+        lifecycle_id = "status",
+        timestamp = "timestamp",
+        resource_id = "resource"
+    )
+
+
+
+log
+
+class(log)
+
+log %>% n_activities()
+
+
+log   %>% processing_time("activity") %>% plot()
+
+
+
+
+
+
+```
+
+
+
+
 
 ```{r}
 #test batch frequency
 
 
-metric_frequency(result_log, "Registration", "B", "concurrent", FALSE )
+
+metric_frequency(result_log, "B", "WorkerB_#0", "concurrent", FALSE )
 ```
 
 
@@ -91,6 +129,14 @@ metric_batch_size(result_log, "B", "WorkerB_#0", "concurrent", exclude_singleton
 # Metric - Activity duration
 metric_activity_duration(result_log, "B", "WorkerB_#0", "concurrent")
 
+
+
+```
+```{r}
+
+#create event log for bupaR
+
+  #result_log %>% eventlog( case_id = "case_id", activity_id = "activity")
 
 
 ```
