@@ -18,4 +18,7 @@ VignetteBuilder: knitr
 Imports: 
     dplyr,
     magrittr,
-    lubridate
+    lubridate,
+    tidyr,
+    reshape,
+    utils
