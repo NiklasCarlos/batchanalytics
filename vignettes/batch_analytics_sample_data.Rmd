@@ -9,6 +9,8 @@ output: html_notebook
 library(batchanalytics)
 library(bupaR)
 library(bamalog)
+library(tidyr)
+
 
 ```
 
@@ -28,6 +30,8 @@ task_log <- csv_log
 
 
 detect batching behaviour and create a task log
+
+add documentation why seq_list
 
 ```{r}
 
@@ -58,7 +62,25 @@ result_log <- detect_batching(task_log = task_log,
 
 
 ```{r}
-head(result_log)
+#head(result_log)
+
+# split cases according to there batching behaviour -> dataframe format
+
+df_logSim <- result_log %>%
+    group_by(case_id) %>%
+    filter(any( batch_type == "simultaneous")) %>% arrange(case_id)
+    
+
+df_logSeq <- result_log %>%
+    group_by(case_id) %>%
+    filter(any( batch_type == "sequential")) %>% arrange(case_id)
+
+
+df_logConc <- result_log %>%
+    group_by(case_id) %>%
+    filter(any( batch_type == "concurrent")) %>% arrange(case_id)
+
+
 ```
 
 
@@ -68,10 +90,9 @@ head(result_log)
 
 ```{r}
 
-library(tidyr)
-
+#create event log for further analysis
 log <- result_log %>%
-    mutate(activity_instance = 1:nrow(.)) %>%
+    mutate(activity_instance = 1:nrow(.)) %>% # maybe try case_id for mutate
     gather(status, timestamp, arrival, start, complete)  %>%
     eventlog(
         case_id = "case_id",
@@ -84,22 +105,31 @@ log <- result_log %>%
 
 
 
-log
-
-class(log)
-
-log %>% n_activities()
-
-
-log   %>% processing_time("activity") %>% plot()
-
-
 
 
 
 
 ```
 
+
+```{r}
+
+#log %>% group_by_case()
+#result_log %>% group_by("case_id")
+
+#logS <- log %>%  filter_attributes(batch_type == "simultaneous" ) %>% traces
+#logSeq
+#logConc
+```
+
+
+
+```{r}
+
+#plot processing time and compare different batch behaviour
+log   %>% processing_time("activity") %>% plot()
+
+```
 
 
 
