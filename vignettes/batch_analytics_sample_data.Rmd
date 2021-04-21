@@ -64,6 +64,8 @@ result_log <- detect_batching(task_log = task_log,
 ```{r}
 #head(result_log)
 
+# refactor one method that gets result_log as input
+
 # split cases according to there batching behaviour -> dataframe format
 
 df_logSim <- result_log %>%
@@ -84,15 +86,45 @@ df_logConc <- result_log %>%
 ```
 
 
+
+```{r}
+#testing gathering
+
+#maybe rename status - arrival
+test <- df_logConc %>% gather(status, timestamp, arrival, start, complete)
+
+
+# check order value of table elogs------
+
+
+#order is wrong see data and ordering col is wrong
+
+```
+
+
 ###batch processing metrics
 
 
 
 ```{r}
 
-#create event log for further analysis
-log <- result_log %>%
-    mutate(activity_instance = 1:nrow(.)) %>% # maybe try case_id for mutate
+#create event log for further analysis elogSim <-....
+
+
+elogSim <- df_logSim %>%
+ #   mutate(instance_id = 1:nrow(.)) %>% # maybe try case_id for mutate
+    gather(status, timestamp, arrival, start, complete)  %>%
+    eventlog(
+        case_id = "case_id",
+        activity_id = "activity",
+        activity_instance_id = "instance_id",
+        lifecycle_id = "status",
+        timestamp = "timestamp",
+        resource_id = "resource"
+    )
+
+elogSeq <- df_logSeq %>%
+  #  mutate(instance_id = 1:nrow(.)) %>% # maybe try case_id for mutate
     gather(status, timestamp, arrival, start, complete)  %>%
     eventlog(
         case_id = "case_id",
@@ -104,9 +136,40 @@ log <- result_log %>%
     )
 
 
+elogConc <- df_logConc %>%
+   # mutate(case_id = 1:nrow(.)) %>% # maybe try case_id for mutate
+    gather(status, timestamp, start, complete)  %>% # arrival omitted , seems to be same as start
+    eventlog(
+        case_id = "case_id",
+        activity_id = "activity",
+        activity_instance_id = "instance_id",
+        lifecycle_id = "status",
+        timestamp = "timestamp",
+        resource_id = "resource"
+    )
 
 
+?eventlog
 
+```
+
+## Cycle Time
+
+The throughput time is the time form the very first event to the last event of a case. The levels at which it can be computed are log, trace, or case.
+
+```{r}
+
+elogSim %>%
+    throughput_time("log") %>%
+    plot()
+
+elogSeq %>%
+    throughput_time("log") %>%
+    plot()
+
+elogConc %>% 
+      throughput_time("log") %>%
+      plot()
 
 
 ```
@@ -114,20 +177,11 @@ log <- result_log %>%
 
 ```{r}
 
-#log %>% group_by_case()
-#result_log %>% group_by("case_id")
+# try through put time for each log collect in c() and than plot boxplot
 
-#logS <- log %>%  filter_attributes(batch_type == "simultaneous" ) %>% traces
-#logSeq
-#logConc
-```
-
-
-
-```{r}
 
 #plot processing time and compare different batch behaviour
-log   %>% processing_time("activity") %>% plot()
+#log   %>% processing_time("activity") %>% plot()
 
 ```
 
