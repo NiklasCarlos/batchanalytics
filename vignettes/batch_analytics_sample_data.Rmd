@@ -87,20 +87,6 @@ df_logConc <- result_log %>%
 
 
 
-```{r}
-#testing gathering
-
-#maybe rename status - arrival
-test <- df_logConc %>% gather(status, timestamp, arrival, start, complete)
-
-
-# check order value of table elogs------
-
-
-#order is wrong see data and ordering col is wrong
-
-```
-
 
 ###batch processing metrics
 
@@ -113,7 +99,7 @@ test <- df_logConc %>% gather(status, timestamp, arrival, start, complete)
 
 elogSim <- df_logSim %>%
  #   mutate(instance_id = 1:nrow(.)) %>% # maybe try case_id for mutate
-    gather(status, timestamp, arrival, start, complete)  %>%
+    gather(status, timestamp,  start, complete)  %>%
     eventlog(
         case_id = "case_id",
         activity_id = "activity",
@@ -125,7 +111,7 @@ elogSim <- df_logSim %>%
 
 elogSeq <- df_logSeq %>%
   #  mutate(instance_id = 1:nrow(.)) %>% # maybe try case_id for mutate
-    gather(status, timestamp, arrival, start, complete)  %>%
+    gather(status, timestamp,  start, complete)  %>%
     eventlog(
         case_id = "case_id",
         activity_id = "activity",
@@ -159,6 +145,8 @@ The throughput time is the time form the very first event to the last event of a
 
 ```{r}
 
+
+
 elogSim %>%
     throughput_time("log") %>%
     plot()
@@ -171,7 +159,32 @@ elogConc %>%
       throughput_time("log") %>%
       plot()
 
+```
 
+```{r}
+
+#test plot all in one
+
+sim <- elogSim %>%
+    throughput_time("log")
+ 
+
+seq <- elogSeq %>%
+    throughput_time("log")
+  
+conc <- elogConc %>% 
+      throughput_time("log")
+     
+ts <- c(sim, seq , conc)
+
+elogSim %>%
+    throughput_time("log")
+
+class(elogSim %>%
+    throughput_time("log"))
+
+ boxplot(sim, seq, conc,xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent")  )
+ ?boxplot()
 ```
 
 
