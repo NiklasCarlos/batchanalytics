@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 
@@ -135,7 +137,7 @@ elogConc <- df_logConc %>%
     )
 
 
-?eventlog
+
 
 ```
 
@@ -145,7 +147,7 @@ The throughput time is the time form the very first event to the last event of a
 
 ```{r}
 
-
+#when writing method consider that not always all batch types are included and also no batching possible -> when plotting and creating boxplot create a generic approach
 
 elogSim %>%
     throughput_time("log") %>%
@@ -158,6 +160,8 @@ elogSeq %>%
 elogConc %>% 
       throughput_time("log") %>%
       plot()
+
+
 
 ```
 
@@ -184,8 +188,11 @@ class(elogSim %>%
     throughput_time("log"))
 
  boxplot(sim, seq, conc,xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent")  )
- ?boxplot()
+
 ```
+
+
+##processing time
 
 
 ```{r}
@@ -198,8 +205,9 @@ class(elogSim %>%
 
 ```
 
+##metric batch frequency
 
-
+This metrics shows .....
 
 ```{r}
 #test batch frequency
