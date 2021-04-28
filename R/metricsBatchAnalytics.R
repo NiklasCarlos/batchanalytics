@@ -9,6 +9,44 @@ metric_cycleTime <- function(event_log){
 
 
 
+#' my_detect_batching
+#' function to facilitate the batching identification process
+#'
+#' @param task_log
+#'
+#' @return result log with batching behaviour
+#' @export
+#'
+#' @examples
+my_detect_batching <- function(task_log){
+  # Create seq_tolerated_gap_list (gap of 0 seconds is allowed)
+  seq_tolerated_gap_list <- seq_tolerated_gap_list_generator(task_log = task_log,
+                                                             seq_tolerated_gap_value = 0)
+
+  subsequence_list <- enumerate_subsequences(task_log, 0)
+  # Use the following line for using frequent sequence mining instead
+  # subsequence_list <- identify_frequent_sequences(task_log, 0)
+
+  # Detect batching behavior
+  result_log <- detect_batching(task_log = task_log,
+                                act_seq_tolerated_gap_list = seq_tolerated_gap_list,
+                                timestamp_format = "yyyy-mm-dd hh:mm:ss",
+                                numeric_timestamps = FALSE,
+                                log_and_model_based = TRUE,
+                                subsequence_list = subsequence_list,
+                                subsequence_type = "enum",
+                                # use `mine` to use frequence sequence mining
+                                # subsequence_type = "mine",
+                                within_case_seq_tolerated_gap = 0,
+                                between_cases_seq_tolerated_gap = 0,
+                                show_progress = F)
+
+  return (result_log)
+
+  }
+
+
+
 # Metric - Batch processing frequency
 #' Metric - Batch processing frequency
 #'
@@ -129,8 +167,6 @@ metric_prevalence <- function(activity_log_with_batches, act, res, type_of_batch
 metric_activity_duration <- function(activity_log_with_batches, act, res, type_of_batch){
 
 
-  ####debugging
-  print("hello world11")
 
   # Select relevant activity instances
   ra_selection <- as.data.frame(activity_log_with_batches %>% filter(activity == act, resource == res))

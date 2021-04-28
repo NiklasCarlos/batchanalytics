@@ -38,27 +38,10 @@ add documentation why seq_list
 ```{r}
 
 
-# Create seq_tolerated_gap_list (gap of 0 seconds is allowed)
-seq_tolerated_gap_list <- seq_tolerated_gap_list_generator(task_log = task_log, 
-                                                           seq_tolerated_gap_value = 0)
+result_log <- my_detect_batching(task_log)
 
-subsequence_list <- enumerate_subsequences(task_log, 0)
-# Use the following line for using frequent sequence mining instead
-# subsequence_list <- identify_frequent_sequences(task_log, 0)
 
-# Detect batching behavior
-result_log <- detect_batching(task_log = task_log,
-                             act_seq_tolerated_gap_list = seq_tolerated_gap_list,
-                             timestamp_format = "yyyy-mm-dd hh:mm:ss",
-                             numeric_timestamps = FALSE,
-                             log_and_model_based = TRUE,
-                             subsequence_list = subsequence_list,
-                             subsequence_type = "enum",
-                             # use `mine` to use frequence sequence mining
-                             # subsequence_type = "mine",
-                             within_case_seq_tolerated_gap = 0,
-                             between_cases_seq_tolerated_gap = 0,
-                             show_progress = F)
+
 ```
 
 
@@ -83,6 +66,15 @@ df_logSeq <- result_log %>%
 df_logConc <- result_log %>%
     group_by(case_id) %>%
     filter(any( batch_type == "concurrent")) %>% arrange(case_id)
+
+#how to find cases where no batching is used?
+
+# log- groupby case - filter any where batchtype != sim || seq|| conc
+
+
+
+#new function for code refactoring
+#get_batching_data(batch_type,result_log)
 
 
 ```
@@ -137,37 +129,68 @@ elogConc <- df_logConc %>%
     )
 
 
+elog <- result_log  %>%
+    gather(status, timestamp, start, complete)  %>% # arrival omitted , seems to be same as start
+    eventlog(
+        case_id = "case_id",
+        activity_id = "activity",
+        activity_instance_id = "instance_id",
+        lifecycle_id = "status",
+        timestamp = "timestamp",
+        resource_id = "resource"
+    )
+
+
 
 
 ```
+
+
+##show process model with batching behaviour
+
+```{r}
+
+
+elog %>% process_map()
+
+
+#identfy which activites are performed with batching behaviour and if possible highlight in output graph or give an additional text output
+
+```
+
+
+
+
 
 ## Cycle Time
 
 The throughput time is the time form the very first event to the last event of a case. The levels at which it can be computed are log, trace, or case.
 
+(overall cycle time, see pic bupR waiting time included)
+
+
 ```{r}
+#cycle time function without bupaR
 
-#when writing method consider that not always all batch types are included and also no batching possible -> when plotting and creating boxplot create a generic approach
 
-elogSim %>%
-    throughput_time("log") %>%
-    plot()
+#view github implementation of bupaR 
+# compare to niels function implementation
 
-elogSeq %>%
-    throughput_time("log") %>%
-    plot()
-
-elogConc %>% 
-      throughput_time("log") %>%
-      plot()
-
+#result_log %>% group_by("case_id") %>% 
 
 
 ```
 
-```{r}
 
-#test plot all in one
+
+```{r}
+#when writing method consider that not always all batch types are included and also no batching possible -> when plotting and creating boxplot create a generic approach#
+
+
+# für modularität keep event log cration seperate from other functions 
+
+#evtl cycle time selber funktion ohne event log schreiben -> von jeden case start - endzeit (groubby case , start - end , -> mean() an niels orientieren) ähnlich für processing time -< vorher #ABER data spliten in "nobatching " vs andere batch types
+
 
 sim <- elogSim %>%
     throughput_time("log")
@@ -179,31 +202,87 @@ seq <- elogSeq %>%
 conc <- elogConc %>% 
       throughput_time("log")
      
-ts <- c(sim, seq , conc)
 
-elogSim %>%
-    throughput_time("log")
 
-class(elogSim %>%
-    throughput_time("log"))
 
  boxplot(sim, seq, conc,xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent")  )
 
 ```
 
 
+
+
 ##processing time
+processing time: the sum of the duration of all activity instances[bupaR]
 
 
 ```{r}
 
-# try through put time for each log collect in c() and than plot boxplot
+
+#processing time
+
+sim <- elogSim %>%
+processing_time("log") 
+
+seq <- elogSeq %>%
+processing_time("log")  
+
+conc <- elogConc %>% 
+processing_time("log")     
 
 
-#plot processing time and compare different batch behaviour
-#log   %>% processing_time("activity") %>% plot()
+boxplot(sim, seq, conc,xlab = "batch type", ylab = "processing Time", names = c("parallel", "sequential", "concurrent")  )
+
+
 
 ```
+
+
+#idle time
+idle time: the time when no activity instance is active
+
+
+
+```{r}
+
+
+sim <- elogSim %>%
+idle_time("log", units = "days")
+
+seq <- elogSeq %>%
+idle_time("log", units = "days")
+
+conc <- elogConc %>% 
+idle_time("log", units = "days")
+
+boxplot(sim, seq, conc,xlab = "batch type", ylab = "idle Time", names = c("parallel", "sequential", "concurrent")  )
+
+ 
+
+
+```
+
+
+#Metric cycle time efficiency
+Ratio of overall processing time relative to the overall cycle time
+
+
+```{r}
+#cycle time efficiency
+
+
+
+# processing time / throughput time
+
+
+cycle_time_efficiency <- (elog %>% processing_time("log")) / (elog %>% throughput_time("log"))
+
+
+
+print(cycle_time_efficiency)
+```
+
+
 
 ##metric batch frequency
 
