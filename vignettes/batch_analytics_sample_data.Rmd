@@ -10,8 +10,8 @@ output:
 
 library(batchanalytics)
 library(bupaR)
-library(bamalog)
-library(tidyr)
+#library(bamalog)
+library(tidyr) # warum brauche ich das noch für gather aber die anderen package(bama) nicht mehr da imported mit package batchAanalytics---
 
 
 ```
@@ -44,114 +44,48 @@ result_log <- my_detect_batching(task_log)
 
 ```
 
-
-
 ```{r}
-#head(result_log)
+#code refacor df_list
+#1 ersetzen
 
-# refactor one method that gets result_log as input
+#df_lists <- get_batching_df_logs(result_log)
 
-# split cases according to there batching behaviour -> dataframe format
-
-df_logSim <- result_log %>%
-    group_by(case_id) %>%
-    filter(any( batch_type == "simultaneous")) %>% arrange(case_id)
-    
-
-df_logSeq <- result_log %>%
-    group_by(case_id) %>%
-    filter(any( batch_type == "sequential")) %>% arrange(case_id)
-
-
-df_logConc <- result_log %>%
-    group_by(case_id) %>%
-    filter(any( batch_type == "concurrent")) %>% arrange(case_id)
-
-#how to find cases where no batching is used?
-
-# log- groupby case - filter any where batchtype != sim || seq|| conc
-
-
-
-#new function for code refactoring
-#get_batching_data(batch_type,result_log)
+get_batching_df_logs(result_log)
 
 
 ```
+
+
+
 
 
 
 
 ###batch processing metrics
 
-
-
 ```{r}
+# transformation to event_logs
+#2 unterer code ersetzten
 
-#create event log for further analysis elogSim <-....
-
-
-elogSim <- df_logSim %>%
- #   mutate(instance_id = 1:nrow(.)) %>% # maybe try case_id for mutate
-    gather(status, timestamp,  start, complete)  %>%
-    eventlog(
-        case_id = "case_id",
-        activity_id = "activity",
-        activity_instance_id = "instance_id",
-        lifecycle_id = "status",
-        timestamp = "timestamp",
-        resource_id = "resource"
-    )
-
-elogSeq <- df_logSeq %>%
-  #  mutate(instance_id = 1:nrow(.)) %>% # maybe try case_id for mutate
-    gather(status, timestamp,  start, complete)  %>%
-    eventlog(
-        case_id = "case_id",
-        activity_id = "activity",
-        activity_instance_id = "instance_id",
-        lifecycle_id = "status",
-        timestamp = "timestamp",
-        resource_id = "resource"
-    )
-
-
-elogConc <- df_logConc %>%
-   # mutate(case_id = 1:nrow(.)) %>% # maybe try case_id for mutate
-    gather(status, timestamp, start, complete)  %>% # arrival omitted , seems to be same as start
-    eventlog(
-        case_id = "case_id",
-        activity_id = "activity",
-        activity_instance_id = "instance_id",
-        lifecycle_id = "status",
-        timestamp = "timestamp",
-        resource_id = "resource"
-    )
-
-
-elog <- result_log  %>%
-    gather(status, timestamp, start, complete)  %>% # arrival omitted , seems to be same as start
-    eventlog(
-        case_id = "case_id",
-        activity_id = "activity",
-        activity_instance_id = "instance_id",
-        lifecycle_id = "status",
-        timestamp = "timestamp",
-        resource_id = "resource"
-    )
-
-
-
+transform_df_to_event_log()
 
 ```
+
+
+
+
+
 
 
 ##show process model with batching behaviour
 
 ```{r}
 
+# create this as new method -> aber auch daran denken das "no batching" eine option ist 
 
-elog %>% process_map()
+
+show_batching_in_process_map()
+
 
 
 #identfy which activites are performed with batching behaviour and if possible highlight in output graph or give an additional text output
@@ -170,6 +104,11 @@ The throughput time is the time form the very first event to the last event of a
 
 
 ```{r}
+
+
+#evtl nicht nögig
+
+
 #cycle time function without bupaR
 
 
@@ -184,6 +123,12 @@ The throughput time is the time form the very first event to the last event of a
 
 
 ```{r}
+
+# create this as new method -> aber auch daran denken das "no batching" eine option ist 
+
+
+
+
 #when writing method consider that not always all batch types are included and also no batching possible -> when plotting and creating boxplot create a generic approach#
 
 
@@ -192,20 +137,9 @@ The throughput time is the time form the very first event to the last event of a
 #evtl cycle time selber funktion ohne event log schreiben -> von jeden case start - endzeit (groubby case , start - end , -> mean() an niels orientieren) ähnlich für processing time -< vorher #ABER data spliten in "nobatching " vs andere batch types
 
 
-sim <- elogSim %>%
-    throughput_time("log")
- 
-
-seq <- elogSeq %>%
-    throughput_time("log")
-  
-conc <- elogConc %>% 
-      throughput_time("log")
-     
+compare_throughput_time()
 
 
-
- boxplot(sim, seq, conc,xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent")  )
 
 ```
 
@@ -219,20 +153,12 @@ processing time: the sum of the duration of all activity instances[bupaR]
 ```{r}
 
 
-#processing time
 
-sim <- elogSim %>%
-processing_time("log") 
-
-seq <- elogSeq %>%
-processing_time("log")  
-
-conc <- elogConc %>% 
-processing_time("log")     
+# create this as new method -> aber auch daran denken das "no batching" eine option ist 
+# modularer aufbau der funktionen
 
 
-boxplot(sim, seq, conc,xlab = "batch type", ylab = "processing Time", names = c("parallel", "sequential", "concurrent")  )
-
+compare_processing_time() # warum global env und nicht function
 
 
 ```
@@ -246,16 +172,7 @@ idle time: the time when no activity instance is active
 ```{r}
 
 
-sim <- elogSim %>%
-idle_time("log", units = "days")
-
-seq <- elogSeq %>%
-idle_time("log", units = "days")
-
-conc <- elogConc %>% 
-idle_time("log", units = "days")
-
-boxplot(sim, seq, conc,xlab = "batch type", ylab = "idle Time", names = c("parallel", "sequential", "concurrent")  )
+compare_idle_time()
 
  
 
@@ -271,15 +188,18 @@ Ratio of overall processing time relative to the overall cycle time
 #cycle time efficiency
 
 
+# create this as new method -> aber auch daran denken das "no batching" eine option ist 
+# modularer aufbau der funktionen
+
+
 
 # processing time / throughput time
 
 
-cycle_time_efficiency <- (elog %>% processing_time("log")) / (elog %>% throughput_time("log"))
+cycle_time_efficiency()
 
 
 
-print(cycle_time_efficiency)
 ```
 
 

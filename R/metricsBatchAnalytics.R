@@ -3,6 +3,288 @@
 
 
 
+#' get batching dataframes
+#'
+#' @param res_Log
+#'
+#' @return creates global vars that contain different batching infos and can be used for further analysis
+#' @export
+#'
+#' @examples
+get_batching_df_logs <- function(res_log){
+
+
+  #TODO
+  # über globale var für df etc nachdenken statt listen transformation -> evtl einfacher
+
+  # create this as new method -> aber auch daran denken das "no batching" eine option ist
+
+  #head(result_log)
+
+  # refactor one method that gets result_log as input
+
+  # split cases according to there batching behaviour -> dataframe format
+
+
+  #define global variables
+  df_logSim <<- res_log %>%
+    group_by(case_id) %>%
+    filter(any( batch_type == "simultaneous")) %>% arrange(case_id)
+
+
+  df_logSeq <<- res_log %>%
+    group_by(case_id) %>%
+    filter(any( batch_type == "sequential")) %>% arrange(case_id)
+
+
+  df_logConc <<- res_log %>%
+    group_by(case_id) %>%
+    filter(any( batch_type == "concurrent")) %>% arrange(case_id)
+
+  #TODO
+  #df_log_noBatching
+
+
+  #how to find cases where no batching is used?
+
+  # log- groupby case - filter any where batchtype != sim || seq|| conc
+
+  #TODO
+  #add dfs dynamic to the list depending which batching behaviour is required
+
+  #df_list<-list(df_logSim,df_logSeq, df_logConc)
+
+
+  #return(df_list)
+
+  #new function for code refactoring
+  #get_batching_data(batch_type,result_log)
+
+}
+
+#tidyr gather
+
+#' transform data frame to event log
+#'
+#' @return creates global vars elogs for each batching type for further analysis
+#' @export
+#'
+#'
+#' @examples
+transform_df_to_event_log <- function(){
+
+  #TODO
+  # über globale var für df etc nachdenken statt listen transformation
+
+
+  # create this as new method -> aber auch daran denken das "no batching" eine option ist
+
+
+  #create event log for further analysis elogSim <-....
+
+
+  #define global variables
+  elogSim <<- df_logSim %>%
+    gather(status, timestamp,  start, complete)  %>%
+    eventlog(
+      case_id = "case_id",
+      activity_id = "activity",
+      activity_instance_id = "instance_id",
+      lifecycle_id = "status",
+      timestamp = "timestamp",
+      resource_id = "resource"
+    )
+
+  elogSeq <<- df_logSeq %>%
+    gather(status, timestamp,  start, complete)  %>%
+    eventlog(
+      case_id = "case_id",
+      activity_id = "activity",
+      activity_instance_id = "instance_id",
+      lifecycle_id = "status",
+      timestamp = "timestamp",
+      resource_id = "resource"
+    )
+
+
+  elogConc <<- df_logConc %>%
+    gather(status, timestamp, start, complete)  %>% # arrival omitted , seems to be same as start
+    eventlog(
+      case_id = "case_id",
+      activity_id = "activity",
+      activity_instance_id = "instance_id",
+      lifecycle_id = "status",
+      timestamp = "timestamp",
+      resource_id = "resource"
+    )
+
+  #log containing all inforamtion
+  elog <<- result_log  %>%
+    gather(status, timestamp, start, complete)  %>% # arrival omitted , seems to be same as start
+    eventlog(
+      case_id = "case_id",
+      activity_id = "activity",
+      activity_instance_id = "instance_id",
+      lifecycle_id = "status",
+      timestamp = "timestamp",
+      resource_id = "resource"
+    )
+
+  #TODO
+  #elog with only noBatching cases
+  #elogNoBatching <<-
+
+}
+
+
+
+
+
+
+
+
+compare_waiting_times <- function(){
+  #TODO
+
+  #implement function that contains waiting times maybe with histogram like in Metrics – Performance measures for Batch Processing.docx described
+}
+
+
+
+
+#' cycle time efficiency
+#'
+#' value defined after duma
+#'
+#' @return
+#' @export
+#'
+#' @examples
+cycle_time_efficiency <- function(){
+  return((elog %>% processing_time("log")) / (elog %>% throughput_time("log")))
+}
+
+
+
+#' compare processing time
+#'
+#' @return
+#' @export
+#'
+#' @examples
+compare_processing_time <- function(){
+
+
+
+  #processing time
+
+  sim <- elogSim %>%
+    processing_time("log")
+
+  seq <- elogSeq %>%
+    processing_time("log")
+
+  conc <- elogConc %>%
+    processing_time("log")
+
+
+  #TODO
+  # "no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
+
+
+
+
+  boxplot(sim, seq, conc,xlab = "batch type", ylab = "processing Time", names = c("parallel", "sequential", "concurrent")  )
+
+print("hi processing plot -- ende")
+
+}
+
+
+#' compare idle times
+#'
+#' @return
+#' @export
+#'
+#' @examples
+compare_idle_time <- function(){
+
+  #TODO
+  # "no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
+
+
+  # create this as new method -> aber auch daran denken das "no batching" eine option ist
+  # modularer aufbau der funktionen
+
+
+  sim <- elogSim %>%
+    idle_time("log", units = "days")
+
+  seq <- elogSeq %>%
+    idle_time("log", units = "days")
+
+  conc <- elogConc %>%
+    idle_time("log", units = "days")
+
+  boxplot(sim, seq, conc,xlab = "batch type", ylab = "idle Time", names = c("parallel", "sequential", "concurrent")  )
+
+}
+
+
+
+
+
+#' compare troughput time
+#'
+#' @return
+#' @export
+#'
+#' @examples
+compare_throughput_time <- function(){
+
+  sim <- elogSim %>%
+    throughput_time("log")
+
+
+  seq <- elogSeq %>%
+    throughput_time("log")
+
+  conc <- elogConc %>%
+    throughput_time("log")
+
+  #TODO
+  # "no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
+
+
+
+
+  boxplot(sim, seq, conc,xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent")  )
+
+}
+
+
+
+#' show batching in process map
+#'
+#' @return
+#' @export
+#'
+#' @examples
+show_batching_in_process_map <- function(){
+
+
+  elog %>% process_map()
+
+
+    #TODO
+
+  #print("noch nicht implementiert")
+}
+
+
+
+
+
 metric_cycleTime <- function(event_log){
 
 }
@@ -16,6 +298,7 @@ metric_cycleTime <- function(event_log){
 #'
 #' @return result log with batching behaviour
 #' @export
+#'
 #'
 #' @examples
 my_detect_batching <- function(task_log){

@@ -9,5 +9,7 @@ NULL
 
 #' @import dplyr
 #' @import tidyr
+#' @import bamalog
 #' @importFrom utils timestamp
+#'
 NULL
