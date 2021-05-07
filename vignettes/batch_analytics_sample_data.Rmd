@@ -84,7 +84,7 @@ transform_df_to_event_log()
 # create this as new method -> aber auch daran denken das "no batching" eine option ist 
 
 
-show_batching_in_process_map()
+class(show_batching_in_process_map())
 
 
 

@@ -11,6 +11,10 @@ library(shiny)
 library(tidyr)
 library(batchanalytics)
 library(bupaR)
+library(ggvis)
+library(DiagrammeR)
+
+
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -70,17 +74,6 @@ shinyServer(function(input, output) {
     }
 
 
-    # init_elog_transformation <- function(){
-    #     sim <<- elogSim %>%
-    #         throughput_time("log")
-    #
-    #
-    #     seq <<- elogSeq %>%
-    #         throughput_time("log")
-    #
-    #     conc <<- elogConc %>%
-    #         throughput_time("log")
-    # }
 
 
 
@@ -99,49 +92,42 @@ shinyServer(function(input, output) {
         #"show_batching_in_process_map", "compare_throughput_time", "compare_processing_time" , "metric_batch_size"
         if(input$funcPlot == "compare_throughput_time") {
 
-            sim <- elogSim %>%
-                throughput_time("log")
 
-
-            seq <- elogSeq %>%
-                throughput_time("log")
-
-            conc <- elogConc %>%
-                throughput_time("log")
-
-
-            boxplot(sim, seq, conc,xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent"))
-            # show_batching_in_process_map()
-
-
+            compare_throughput_time()
 
         }else if(input$funcPlot == "compare_processing_time"){
-            #processing time
 
-            sim <- elogSim %>%
-                processing_time("log")
-
-            seq <- elogSeq %>%
-                processing_time("log")
-
-            conc <- elogConc %>%
-                processing_time("log")
+            compare_processing_time()
 
 
-            #TODO
-            # "no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
-
-
-
-
-            boxplot(sim, seq, conc,xlab = "batch type", ylab = "processing Time", names = c("parallel", "sequential", "concurrent")  )
         }else  if(input$funcPlot == "compare_idle_time"){
             compare_idle_time()
+        }else if(input$funcPlot == "show_batching_in_process_map"){
+            #grViz( show_batching_in_process_map())
         }
 
 
     })
 
+    #graph outputs
+    output$process_map <- renderGrViz({
+       # req(input$file1)
+
+       # if(input$funcPlot == "show_batching_in_process_map")
+
+            #show_batching_in_process_map()
+           # process_map(elog)
+
+        show_batching_in_process_map()
+             })
+
+
+    #recommendations
+
+    output$recommendation <- renderTable({
+
+       return(c("1. ddk", "2.kdkdk"))
+    })
 
 
 

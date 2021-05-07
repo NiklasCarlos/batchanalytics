@@ -10,47 +10,40 @@
 # Concepts about Reactive programming used by Shiny,
 # https://shiny.rstudio.com/articles/reactivity-overview.html
 
-# Load R packages
+library(bupaR)
 library(shiny)
-library(shinythemes)
+library(DiagrammeR)
+#Create a data frame
+key<-rep("DISCHARGEDATE", 5)
+time<-seq(as.POSIXct("2017-09-20 12:07:00",format="%Y-%m-%d %H:%M:%S"),
+          by="min",length.out = 5)
+patient<-seq(1,5)
 
+df<-as.data.frame(cbind(key=as.character(key),time=as.character(time),
+                        patient=as.character(patient)), stringsAsFactors = FALSE)
+df$time<- as.POSIXct(df$time, format="%Y-%m-%d %H:%M:%S")
 
-  # Define UI
-  ui <- fluidPage(theme = shinytheme("cerulean"),
-    navbarPage(
-      # theme = "cerulean",  # <--- To use a theme, uncomment this
-      "My first app",
-      tabPanel("Navbar 1",
-               sidebarPanel(
-                 tags$h3("Input:"),
-                 textInput("txt1", "Given Name:", ""),
-                 textInput("txt2", "Surname:", ""),
+#create a simple log
+s.Log<-bupaR::simple_eventlog(eventlog=df,
+                              case_id="patient",
+                              activity_id="key",
+                              timestamp="time")
+#shiny
+ui <- fluidPage(
 
-               ), # sidebarPanel
-               mainPanel(
-                            h1("Header 1"),
-                            p("for the bois"),
-                            h4("Output 1"),
-                            verbatimTextOutput("txtout"),
+  mainPanel(
+    #plotOutput("process_map")
+    grVizOutput("process_map")
+  )
+)
 
-               ) # mainPanel
+server <- function(input, output) {
 
-      ), # Navbar 1, tabPanel
-      tabPanel("Navbar 2", "This panel is intentionally left blank"),
-      tabPanel("Navbar 3", "This panel is intentionally left blank")
+  output$process_map <- renderGrViz({
 
-    ) # navbarPage
-  ) # fluidPage
+    process_map(elog)
 
+  })
+}
 
-  # Define server function
-  server <- function(input, output) {
-
-    output$txtout <- renderText({
-      paste( input$txt1, input$txt2, sep = " " )
-    })
-  } # server
-
-
-  # Create Shiny object
-  shinyApp(ui = ui, server = server)
+shinyApp(ui = ui, server = server)

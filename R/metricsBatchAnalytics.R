@@ -273,7 +273,7 @@ compare_throughput_time <- function(){
 show_batching_in_process_map <- function(){
 
 
-  elog %>% process_map()
+ class( process_map(elog,))
 
 
     #TODO
