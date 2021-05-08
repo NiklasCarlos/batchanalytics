@@ -50,13 +50,20 @@ shinyServer(function(input, output) {
         req(input$file1)
 
 
+        #show summary evtl besser , mit result log und process map und
+        if(input$funcTable == "show_summary") {
 
-        if(input$funcTable == "show_result_log") {
-            return(result_log)
-        }
-        else {
-            return(df)
-        }
+
+
+            if(input$disp == "head") {
+                return(head(result_log))
+            }
+            else {
+                return(result_log)
+            }
+
+            }
+
 
 
     })
@@ -111,12 +118,11 @@ shinyServer(function(input, output) {
 
     #graph outputs
     output$process_map <- renderGrViz({
-       # req(input$file1)
+        req(input$file1)
 
        # if(input$funcPlot == "show_batching_in_process_map")
 
-            #show_batching_in_process_map()
-           # process_map(elog)
+
 
         show_batching_in_process_map()
              })
