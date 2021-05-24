@@ -14,6 +14,8 @@ library(bupaR)
 library(ggvis)
 library(DiagrammeR)
 
+result_log <<- NULL
+ready <<- F
 
 
 # Define server logic required to draw a histogram
@@ -21,6 +23,7 @@ shinyServer(function(input, output) {
 
 
     output$contents <- renderTable({
+        print("before")
 
         # input$file1 will be NULL initially. After the user selects
         # and uploads a file, head of that data file by default,
@@ -30,8 +33,10 @@ shinyServer(function(input, output) {
 
         df <- read.csv(input$file1$datapath)
 
-
+            print("vor init meth")
         init_batching_analysis(df)
+        print("ready after init = ")
+        print(ready)
 
         if(input$disp == "head") {
             return(head(df))
@@ -45,14 +50,47 @@ shinyServer(function(input, output) {
 
 
 
+
+
+
+
+    #def func evtl verschieben nach package banalyitcs...
+    init_batching_analysis <- function(df){
+        print("head of df for debugging")
+        print(head(df))
+        print("init phase begins")
+
+        # result_log <<- my_detect_batching(df)
+        res_log <-   my_detect_batching(df)
+
+        result_log <<- res_log
+
+         print("result_log erstellt")
+         print(head(result_log))
+
+        get_batching_df_logs(result_log)
+        print("bf transform df log")
+        transform_df_to_event_log()
+
+        print("init phase ends")
+        ready <<- TRUE
+
+
+    }
+
+
+
     #implement batch_size -> needed input values for this function
     output$result <- renderTable({
-        req(input$file1)
 
+        print("check condition summary")
 
+        req(ready)
+
+        print("in result_log ")
         #show summary evtl besser , mit result log und process map und
         if(input$funcTable == "show_summary") {
-
+            print("in result_log methode ")
 
 
             if(input$disp == "head") {
@@ -62,7 +100,7 @@ shinyServer(function(input, output) {
                 return(result_log)
             }
 
-            }
+        }
 
 
 
@@ -70,35 +108,21 @@ shinyServer(function(input, output) {
 
 
 
-
-    #def func evtl verschieben nach package banalyitcs...
-    init_batching_analysis <- function(df){
-        result_log <- my_detect_batching(df)
-        get_batching_df_logs(result_log)
-        transform_df_to_event_log()
-
-
-    }
-
-
-
-
-
-
     #future funktion for ploting boxplots, process_maps etc
     output$plot <- renderPlot({
+        print("check condition plot")
 
         # input$file1 will be NULL initially. After the user selects
         # and uploads a file, head of that data file by default,
         # or all rows if selected, will be shown.
 
-        req(input$file1)
+        req(ready)
 
         #init_elog_transformation()
-
+        print("in plot")
         #"show_batching_in_process_map", "compare_throughput_time", "compare_processing_time" , "metric_batch_size"
         if(input$funcPlot == "compare_throughput_time") {
-
+        print("in if plot")
 
             compare_throughput_time()
 
@@ -118,7 +142,9 @@ shinyServer(function(input, output) {
 
     #graph outputs
     output$process_map <- renderGrViz({
-        req(input$file1)
+
+        print("check condition map")
+        req(ready)
 
        # if(input$funcPlot == "show_batching_in_process_map")
 

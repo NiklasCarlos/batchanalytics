@@ -14,6 +14,7 @@ library(DiagrammeR)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
+    #cerulean, superhero
     theme = shinytheme("superhero"),
 
     # Application title
@@ -72,10 +73,11 @@ shinyUI(fluidPage(
 
 
             tabsetPanel(type = "tabs",
-                      tabPanel("Table",  tableOutput("contents")),
-                      tabPanel("Summary", tableOutput("result"),grVizOutput("process_map")),
+                    tabPanel("Data",  tableOutput("contents")),
+                      tabPanel("Summary",p("Result Log Overview"), tableOutput("result"),hr(),p("Process Overview:"),grVizOutput("process_map")),
                       tabPanel("Plot", plotOutput("plot")),
-                      tabPanel("Recommendations", h3("recommendations from 1 to n: "), tableOutput("recommendation")),
+                      tabPanel("Recommendations", h3("recommendations from 1 to n: "), tableOutput("recommendation"))
+
                     #  tabPanel("Process Map",p("test") )
 
 

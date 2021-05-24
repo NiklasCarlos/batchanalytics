@@ -1,11 +1,9 @@
-#Functions for Batch analytic one function per metric
-
 
 
 
 #' get batching dataframes
 #'
-#' @param res_Log
+#' @param res_Log is the log which results form
 #'
 #' @return creates global vars that contain different batching infos and can be used for further analysis
 #' @export
@@ -41,15 +39,21 @@ get_batching_df_logs <- function(res_log){
     group_by(case_id) %>%
     filter(any( batch_type == "concurrent")) %>% arrange(case_id)
 
+
+  #alternative look for is.na in all activities of a case maybe any() not perfect here
+  #   df_logNoBatch <- res_log %>%
+  #     group_by(case_id) %>%
+  #     filter( all((batch_type != "concurrent") & (batch_type != "sequential") & (batch_type != "simultaneous") )) %>% arrange(case_id)
+  # print("dfno batch")
   #TODO
   #df_log_noBatching
 
 
   #how to find cases where no batching is used?
 
-  # log- groupby case - filter any where batchtype != sim || seq|| conc
+  #log- groupby case - filter any where batchtype != sim || seq|| conc
 
-  #TODO
+  #TODOmy_detect_batching
   #add dfs dynamic to the list depending which batching behaviour is required
 
   #df_list<-list(df_logSim,df_logSeq, df_logConc)
@@ -82,8 +86,9 @@ transform_df_to_event_log <- function(){
 
   #create event log for further analysis elogSim <-....
 
+  print("in transform df meth")
 
-  #define global variables
+ # define global variables
   elogSim <<- df_logSim %>%
     gather(status, timestamp,  start, complete)  %>%
     eventlog(
@@ -130,9 +135,18 @@ transform_df_to_event_log <- function(){
       resource_id = "resource"
     )
 
-  #TODO
-  #elog with only noBatching cases
-  #elogNoBatching <<-
+  # #TODO
+  # #elog with only noBatching cases
+  # # elogNoBatch <- df_logNoBatch %>%
+  # #   gather(status, timestamp, start, complete)  %>% # arrival omitted , seems to be same as start
+  # #   eventlog(
+  # #     case_id = "case_id",
+  # #     activity_id = "activity",
+  # #     activity_instance_id = "instance_id",
+  # #     lifecycle_id = "status",
+  # #     timestamp = "timestamp",
+  # #     resource_id = "resource"
+  # #   )
 
 }
 
@@ -162,6 +176,7 @@ compare_waiting_times <- function(){
 #' @examples
 cycle_time_efficiency <- function(){
   return((elog %>% processing_time("log")) / (elog %>% throughput_time("log")))
+
 }
 
 
@@ -188,15 +203,17 @@ compare_processing_time <- function(){
     processing_time("log")
 
 
+
   #TODO
-  # "no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
+  # no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
+  # noBatch <- elogNoBatch %>%
+  #   processing_time("log")
 
 
-
-
+  #TODO
+  #add noBatch maybe generic approach if elogs without vals
   boxplot(sim, seq, conc,xlab = "batch type", ylab = "processing Time", names = c("parallel", "sequential", "concurrent")  )
 
-print("hi processing plot -- ende")
 
 }
 
@@ -210,7 +227,7 @@ print("hi processing plot -- ende")
 compare_idle_time <- function(){
 
   #TODO
-  # "no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
+  # no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
 
 
   # create this as new method -> aber auch daran denken das "no batching" eine option ist
@@ -225,7 +242,12 @@ compare_idle_time <- function(){
 
   conc <- elogConc %>%
     idle_time("log", units = "days")
-
+  #
+  # #TODO
+  # # no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
+  # # noBatch <- elogNoBatch %>%
+  # #   idle_time("log", units = "days")
+  #
   boxplot(sim, seq, conc,xlab = "batch type", ylab = "idle Time", names = c("parallel", "sequential", "concurrent")  )
 
 }
@@ -241,24 +263,28 @@ compare_idle_time <- function(){
 #'
 #' @examples
 compare_throughput_time <- function(){
-
-  sim <- elogSim %>%
-    throughput_time("log")
-
-
-  seq <- elogSeq %>%
-    throughput_time("log")
-
-  conc <- elogConc %>%
-    throughput_time("log")
-
-  #TODO
-  # "no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
+  #
+  #   print("hi gllgl")
+  #
+    sim <- elogSim %>%
+      throughput_time("log")
 
 
+    seq <- elogSeq %>%
+      throughput_time("log")
 
-
-  boxplot(sim, seq, conc,xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent")  )
+    conc <- elogConc %>%
+      throughput_time("log")
+  #
+  #   #TODO
+  #   # no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
+  #   # noBatch <- elogNoBatch %>%
+  #   #   throughput_time("log")
+  #
+  #
+  #
+  #
+    boxplot(sim, seq, conc,xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent")  )
 
 }
 
@@ -273,20 +299,12 @@ compare_throughput_time <- function(){
 show_batching_in_process_map <- function(){
 
 
- class( process_map(elog,))
+  process_map(elog)
 
 
-    #TODO
+  #TODO
 
   #print("noch nicht implementiert")
-}
-
-
-
-
-
-metric_cycleTime <- function(event_log){
-
 }
 
 

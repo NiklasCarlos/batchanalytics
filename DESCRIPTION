@@ -1,6 +1,6 @@
 Package: batchanalytics
 Type: Package
-Title: Provides Functions That Represent Metrics For Analysing Batching Behavior. 
+Title: Functions That Represent Metrics For Analysing Batching Behavior
 Version: 0.1.0
 Author: Niklas Haarbeck
 Maintainer: The package maintainer <niklas.cf.haarbeck@campus.tu-berlin.de>

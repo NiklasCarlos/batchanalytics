@@ -4,7 +4,7 @@
 \name{batchanalytics-package}
 \alias{batchanalytics}
 \alias{batchanalytics-package}
-\title{batchanalytics: Provides Functions That Represent Metrics For Analysing Batching Behavior.}
+\title{batchanalytics: Functions That Represent Metrics For Analysing Batching Behavior}
 \description{
 Provides Functions For Analysing Batching Behavior. The Package is build as an extension for the bama algorihm [https://github.com/nielsmartin/bama]
 }

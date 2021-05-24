@@ -7,7 +7,7 @@
 get_batching_df_logs(res_log)
 }
 \arguments{
-\item{res_Log}{}
+\item{res_Log}{is the log which results form}
 }
 \value{
 creates global vars that contain different batching infos and can be used for further analysis

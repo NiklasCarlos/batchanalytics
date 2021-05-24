@@ -10,7 +10,7 @@ output:
 
 library(batchanalytics)
 library(bupaR)
-#library(bamalog)
+library(bamalog)
 library(tidyr) # warum brauche ich das noch für gather aber die anderen package(bama) nicht mehr da imported mit package batchAanalytics---
 
 
@@ -84,7 +84,7 @@ transform_df_to_event_log()
 # create this as new method -> aber auch daran denken das "no batching" eine option ist 
 
 
-class(show_batching_in_process_map())
+show_batching_in_process_map()
 
 
 
