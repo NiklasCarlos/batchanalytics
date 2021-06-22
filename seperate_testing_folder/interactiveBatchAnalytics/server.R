@@ -23,7 +23,7 @@ shinyServer(function(input, output) {
 
 
     output$contents <- renderTable({
-        print("before")
+
 
         # input$file1 will be NULL initially. After the user selects
         # and uploads a file, head of that data file by default,
@@ -35,7 +35,7 @@ shinyServer(function(input, output) {
 
             print("vor init meth")
         init_batching_analysis(df)
-        print("ready after init = ")
+       print("ready after init = ")
         print(ready)
 
         if(input$disp == "head") {
@@ -135,6 +135,18 @@ shinyServer(function(input, output) {
             compare_idle_time()
         }else if(input$funcPlot == "show_batching_in_process_map"){
             #grViz( show_batching_in_process_map())
+        }else if(input$funcPlot == "compare_processing_time_of_activites"){
+            #grViz( show_batching_in_process_map())
+            compare_processing_time_of_activites()
+
+
+
+        }else if(input$funcPlot == "compare_throughput_time_of_activites"){
+            #grViz( show_batching_in_process_map())
+            compare_throughput_time_of_activites()
+
+
+
         }
 
 
@@ -152,6 +164,16 @@ shinyServer(function(input, output) {
 
         show_batching_in_process_map()
              })
+
+    #table with batch activites outputs
+    output$batch_activities <- renderTable({
+
+        print("check condition map")
+        req(ready)
+
+        show_dataFrame_with_batching_activities(get_batching_activities_for_each_type())
+
+    })
 
 
     #recommendations

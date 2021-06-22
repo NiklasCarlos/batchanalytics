@@ -15,7 +15,7 @@ library(DiagrammeR)
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
     #cerulean, superhero
-    theme = shinytheme("superhero"),
+    theme = shinytheme("cerulean"),
 
     # Application title
     titlePanel("Interactive Batch Analytics"),
@@ -50,7 +50,7 @@ shinyUI(fluidPage(
             hr(),
 
             selectInput("funcPlot", "Choose function for ploting:",
-                        choices= c("compare_throughput_time", "compare_processing_time" , "compare_idle_time","show_batching_in_process_map" )),
+                        choices= c("compare_throughput_time", "compare_processing_time" , "compare_idle_time","show_batching_in_process_map", "compare_processing_time_of_activites", "compare_throughput_time_of_activites" )),
 
             hr(),
 
@@ -74,7 +74,7 @@ shinyUI(fluidPage(
 
             tabsetPanel(type = "tabs",
                     tabPanel("Data",  tableOutput("contents")),
-                      tabPanel("Summary",p("Result Log Overview"), tableOutput("result"),hr(),p("Process Overview:"),grVizOutput("process_map")),
+                      tabPanel("Summary",p("Result Log Overview"), tableOutput("result"),hr(),p("Process Overview:"),grVizOutput("process_map"), p("Activities that show batching behaviour:"), tableOutput("batch_activities")),
                       tabPanel("Plot", plotOutput("plot")),
                       tabPanel("Recommendations", h3("recommendations from 1 to n: "), tableOutput("recommendation"))
 

@@ -41,9 +41,9 @@ get_batching_df_logs <- function(res_log){
 
 
   #alternative look for is.na in all activities of a case maybe any() not perfect here
-  #   df_logNoBatch <- res_log %>%
-  #     group_by(case_id) %>%
-  #     filter( all((batch_type != "concurrent") & (batch_type != "sequential") & (batch_type != "simultaneous") )) %>% arrange(case_id)
+    df_logNoBatch <<- res_log %>%
+      group_by(case_id) %>%
+      filter( all((batch_type != "concurrent") & (batch_type != "sequential") & (batch_type != "simultaneous") )) %>% arrange(case_id)
   # print("dfno batch")
   #TODO
   #df_log_noBatching
@@ -51,7 +51,7 @@ get_batching_df_logs <- function(res_log){
 
   #how to find cases where no batching is used?
 
-  #log- groupby case - filter any where batchtype != sim || seq|| conc
+  #log- groupby case - filter any where batchtype != sim & seq & conc
 
   #TODOmy_detect_batching
   #add dfs dynamic to the list depending which batching behaviour is required
@@ -135,18 +135,73 @@ transform_df_to_event_log <- function(){
       resource_id = "resource"
     )
 
-  # #TODO
-  # #elog with only noBatching cases
-  # # elogNoBatch <- df_logNoBatch %>%
-  # #   gather(status, timestamp, start, complete)  %>% # arrival omitted , seems to be same as start
-  # #   eventlog(
-  # #     case_id = "case_id",
-  # #     activity_id = "activity",
-  # #     activity_instance_id = "instance_id",
-  # #     lifecycle_id = "status",
-  # #     timestamp = "timestamp",
-  # #     resource_id = "resource"
-  # #   )
+  #TODO
+  #elog with only noBatching cases
+  elogNoBatch <<- df_logNoBatch %>%
+    gather(status, timestamp, start, complete)  %>% # arrival omitted , seems to be same as start
+    eventlog(
+      case_id = "case_id",
+      activity_id = "activity",
+      activity_instance_id = "instance_id",
+      lifecycle_id = "status",
+      timestamp = "timestamp",
+      resource_id = "resource"
+    )
+
+}
+
+
+
+#which activities use batching and what type , how often
+
+
+
+#' show_batching_activities
+#'
+#'which activities use batching
+#'
+#' @return activities that use batching
+#' @export
+#'
+#' @examples
+show_batching_activities <- function(){
+
+  #filter col where batchtype != Na. This are the batch activities
+  onlyBatchActivities <- result_log %>% filter(!is.na(batch_type))
+
+ res <-  unique(onlyBatchActivities[, "activity"])
+
+
+ return(res)
+
+}#' show_dataFrame_with_batching_activities
+#'
+#'show dataframe with  activities use batching
+#'
+#' @return activities that use batching
+#' @export
+#'
+#' @examples
+show_dataFrame_with_batching_activities <- function(liste){
+
+  #get all activities
+  batching_act <-levels(elog$activity)
+
+  #get for each type activities that are contained
+  simultan <- liste[[1]]
+  sequential <- liste[[2]]
+  conc <- liste[[3]]
+
+
+  sim_col <- batching_act %in% simultan
+  seq_col <- batching_act %in% sequential
+  conc_col <- batching_act %in% conc
+
+
+  mydataFrame <- data.frame(activity = batching_act, simultanous = sim_col, sequential = seq_col,concurrent = conc_col)
+
+
+  return(mydataFrame)
 
 }
 
@@ -154,7 +209,33 @@ transform_df_to_event_log <- function(){
 
 
 
+#' show_batching_activities_for_each_type
+#'
+#'which activities use batching
+#'
+#' @return activities that use batching in a list first element of list is sim, 2. seq, 3. conc
+#' @export
+#'
+#' @examples
+get_batching_activities_for_each_type <- function(){
 
+  #filter col where batchtype != Na. This are the batch activities
+  onlyBatchActivities <- result_log %>% filter(!is.na(batch_type))
+
+
+  sim <- onlyBatchActivities %>% filter(batch_type == "simultaneous")
+  seq <- onlyBatchActivities %>% filter(batch_type == "sequential")
+  conc <- onlyBatchActivities %>% filter(batch_type == "concurrent")
+
+
+  resSim <-  unique(sim[, "activity"])
+  resSeq <-  unique(seq[, "activity"])
+  resConc <-  unique(conc[, "activity"])
+
+
+  return(list(resSim,resSeq,resConc))
+
+}
 
 
 compare_waiting_times <- function(){
@@ -179,6 +260,66 @@ cycle_time_efficiency <- function(){
 
 }
 
+
+
+#' compare processing time for each batching type and see activity duration
+#'
+#' @return
+#' @export
+#'
+#' @examples
+compare_processing_time_of_activites <- function(){
+
+
+
+  #processing time
+
+  sim <- elogSim %>%
+    processing_time("activity")
+
+  seq <- elogSeq %>%
+    processing_time("activity")
+
+  conc <- elogConc %>%
+    processing_time("activity")
+
+
+
+  #TODO
+  # no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
+  # noBatch <- elogNoBatch %>%
+  #   processing_time("log")
+
+
+  #TODO
+  #add noBatch maybe generic approach if elogs without vals
+  #boxplot(sim, seq, conc,xlab = "batch type", ylab = "processing Time", names = c("parallel", "sequential", "concurrent")  )
+
+ # boxplot(sim, seq, conc)
+ # boxplot(sim,xlab = "batch type simultanous" )
+
+  print(sim)
+  plot(sim)
+
+}
+
+#' compare throughput time for each batching type and see activity duration
+#'
+#' @return ggplot boxplot
+#' @export
+#'
+#' @examples
+compare_throughput_time_of_activites <- function(){
+
+  res_with_throughput_Time <- result_log
+
+  res_with_throughput_Time$Throughput_time = result_log$complete - result_log$start
+
+  res_with_throughput_Time$batch_type[is.na(res_with_throughput_Time$batch_type)] <- "no batching"
+
+ return(ggplot(data = res_with_throughput_Time, aes(x=activity, y=Throughput_time)) + geom_boxplot(aes(fill=batch_type)))
+
+}
 
 
 #' compare processing time
@@ -216,6 +357,11 @@ compare_processing_time <- function(){
 
 
 }
+
+
+
+
+
 
 
 #' compare idle times
@@ -304,8 +450,9 @@ show_batching_in_process_map <- function(){
 
   #TODO
 
-  #print("noch nicht implementiert")
-}
+  #print("noch nicht implementiert") color nodes in red where batching or sth similar see documentation of graphic libary that creates the node graph
+  # use show batch activites which returns all activites that contain batching
+  }
 
 
 

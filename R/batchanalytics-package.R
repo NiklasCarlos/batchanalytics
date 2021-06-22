@@ -10,6 +10,7 @@ NULL
 #' @import dplyr
 #' @import tidyr
 #' @import bamalog
+#' @import ggplot2
 #' @importFrom utils timestamp
 #'
 NULL

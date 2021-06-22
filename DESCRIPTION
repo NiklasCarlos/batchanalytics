@@ -21,4 +21,5 @@ Imports:
     lubridate,
     utils,
     bamalog,
-    tidyr
+    tidyr,
+    ggplot2
