@@ -42,7 +42,7 @@ shinyUI(fluidPage(
             # evtl auch eine compare throughput etc implementieren die das boxplot in zahlen ausgeben
             #choices= lsf.str("package:batchanalytics") war vorher c(val1,val2 etc), lsf.str("package:batchanalytics") lists all functions of a package
             selectInput("funcTable", "Choose function:",
-                        choices= c("show_summary",   "metric_batch_size","metric_frequency" ,"compare_throughput_time", "compare_processing_time"  )),
+                        choices= c("show_summary",   "metric_batch_size","metric_batch_frequency" ,"metric_waiting_times", "compare_processing_time"  )),
 
             #TODO
             #input val widget necessary
@@ -72,11 +72,12 @@ shinyUI(fluidPage(
 
 
 
+
             tabsetPanel(type = "tabs",
                     tabPanel("Data",  tableOutput("contents")),
-                      tabPanel("Summary",p("Result Log Overview"), tableOutput("result"),hr(),p("Process Overview:"),grVizOutput("process_map"), p("Activities that show batching behaviour:"), tableOutput("batch_activities")),
-                      tabPanel("Plot", plotOutput("plot")),
-                      tabPanel("Recommendations", h3("recommendations from 1 to n: "), tableOutput("recommendation"))
+                      tabPanel("Summary",textOutput("selected_fun"),hr(), tableOutput("result"),hr(),p("Process Overview:"),grVizOutput("process_map"), p("Activities that show batching behaviour:"), tableOutput("batch_activities")),
+                      tabPanel("Plot",textOutput("selected_fun_plot"),hr(), plotOutput("plot"),hr(),tableOutput("result_plot"),hr(), textOutput("selected_fun_explanation")),
+                      tabPanel("Recommendations", h3("recommendations from all metrics: "),hr(),h6("Recommendation for optimal processing time: "), textOutput("rec_metric_processTime"),hr(), h6("Recommendation for optimal throughput time: "),textOutput("rec_metric_throughputTime"), hr(),h6("Recommendation for optimal idle time: "),textOutput("rec_metric_idleTime"),hr(), tableOutput("recommendation"))
 
                     #  tabPanel("Process Map",p("test") )
 

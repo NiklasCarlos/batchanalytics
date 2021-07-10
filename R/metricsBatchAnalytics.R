@@ -164,7 +164,7 @@ transform_df_to_event_log <- function(){
 #' @export
 #'
 #' @examples
-show_batching_activities <- function(){
+get_batching_activities <- function(){
 
   #filter col where batchtype != Na. This are the batch activities
   onlyBatchActivities <- result_log %>% filter(!is.na(batch_type))
@@ -177,6 +177,8 @@ show_batching_activities <- function(){
 }#' show_dataFrame_with_batching_activities
 #'
 #'show dataframe with  activities use batching
+#'
+#'get_batching_activities_for_each_type methode is usallz the liste parameter
 #'
 #' @return activities that use batching
 #' @export
@@ -198,7 +200,7 @@ show_dataFrame_with_batching_activities <- function(liste){
   conc_col <- batching_act %in% conc
 
 
-  mydataFrame <- data.frame(activity = batching_act, simultanous = sim_col, sequential = seq_col,concurrent = conc_col)
+  mydataFrame <- data.frame(activity = batching_act, simultaneous = sim_col, sequential = seq_col,concurrent = conc_col)
 
 
   return(mydataFrame)
@@ -237,7 +239,7 @@ get_batching_activities_for_each_type <- function(){
 
 }
 
-
+##############################################################
 compare_waiting_times <- function(){
   #TODO
 
@@ -304,6 +306,7 @@ compare_processing_time_of_activites <- function(){
 }
 
 #' compare throughput time for each batching type and see activity duration
+#' https://stackoverflow.com/questions/14604439/plot-multiple-boxplot-in-one-graph
 #'
 #' @return ggplot boxplot
 #' @export
@@ -317,7 +320,7 @@ compare_throughput_time_of_activites <- function(){
 
   res_with_throughput_Time$batch_type[is.na(res_with_throughput_Time$batch_type)] <- "no batching"
 
- return(ggplot(data = res_with_throughput_Time, aes(x=activity, y=Throughput_time)) + geom_boxplot(aes(fill=batch_type)))
+   return(ggplot(data = res_with_throughput_Time, aes(x=activity, y=Throughput_time)) + geom_boxplot(aes(fill=batch_type)))
 
 }
 
@@ -328,7 +331,7 @@ compare_throughput_time_of_activites <- function(){
 #' @export
 #'
 #' @examples
-compare_processing_time <- function(){
+compare_processing_time <- function(bplot = TRUE){
 
 
 
@@ -353,7 +356,7 @@ compare_processing_time <- function(){
 
   #TODO
   #add noBatch maybe generic approach if elogs without vals
-  boxplot(sim, seq, conc,xlab = "batch type", ylab = "processing Time", names = c("parallel", "sequential", "concurrent")  )
+  boxplot(sim, seq, conc,xlab = "batch type", ylab = "processing Time", names = c("parallel", "sequential", "concurrent"), plot = bplot )
 
 
 }
@@ -370,7 +373,7 @@ compare_processing_time <- function(){
 #' @export
 #'
 #' @examples
-compare_idle_time <- function(){
+compare_idle_time <- function(bplot = TRUE){
 
   #TODO
   # no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
@@ -394,7 +397,7 @@ compare_idle_time <- function(){
   # # noBatch <- elogNoBatch %>%
   # #   idle_time("log", units = "days")
   #
-  boxplot(sim, seq, conc,xlab = "batch type", ylab = "idle Time", names = c("parallel", "sequential", "concurrent")  )
+  boxplot(sim, seq, conc,xlab = "batch type", ylab = "idle Time", names = c("parallel", "sequential", "concurrent") , plot = bplot )
 
 }
 
@@ -408,7 +411,7 @@ compare_idle_time <- function(){
 #' @export
 #'
 #' @examples
-compare_throughput_time <- function(){
+compare_throughput_time <- function(bplot = TRUE){
   #
   #   print("hi gllgl")
   #
@@ -430,7 +433,7 @@ compare_throughput_time <- function(){
   #
   #
   #
-    boxplot(sim, seq, conc,xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent")  )
+    boxplot(sim, seq, conc,xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent"), plot = bplot  )
 
 }
 
@@ -493,6 +496,71 @@ my_detect_batching <- function(task_log){
 
   }
 
+#########################################Batch processing frequency
+
+
+#' batch_frequency_to_dataframe
+#'
+#'
+#' @param relative relative = true ; false = absolute
+#'
+#' @return dataframe that contains frequency information
+#' @export
+#'
+#' @examples
+batch_frequency_to_dataframe <- function(relative = TRUE){
+
+  mylist <- c()
+  #Create an empty data frame
+  df <- data.frame(batch_type=character(), activity=character(), batch_frequency=double())
+
+
+  for (b_type in get_batch_types(result_log)) {
+    for (b_act in get_act_for_specific_batch_type(b_type)) {
+      size_stats <- shiny_metric_batch_frequency(result_log,b_act,b_type,relative)
+      mylist <- list(batch_type = b_type, activity = b_act, batch_frequency = size_stats)
+      df = rbind(df,mylist, stringsAsFactors=FALSE)
+
+    }
+  }
+
+  return(df)
+
+}
+
+#' shiny_metric_batch_frequency
+#'
+#' @param activity_log_with_batches
+#' @param act
+#' @param type_of_batch
+#' @param relative
+#'
+#' @return
+#' @export
+#'
+#' @examples
+shiny_metric_batch_frequency <- function(activity_log_with_batches, act, type_of_batch, relative = TRUE){
+
+  # Select relevant activity instances
+  ra_selection <- as.data.frame(activity_log_with_batches %>% filter(activity == act))
+
+  # Determine number of batches of this type (having size > 1)
+  n_batches <- length(unique(ra_selection[which(ra_selection$batch_type == type_of_batch),"batch_number"]))
+
+  # Return value depending on 'relative' parameter
+  if(relative == FALSE){
+    return(n_batches)
+  } else{
+    # Implemented as: number of batches with size > 1 / (number of singleton groups + number of batches with size > 1)
+
+    # Determine number of 'singleton groups'
+    n_singl_groups <- nrow(ra_selection) - as.numeric(nrow(as.data.frame(ra_selection %>% filter(batch_type == type_of_batch))))
+
+    # Calculate value
+    output <- n_batches / (n_singl_groups + n_batches)
+    return(output)
+  }
+}
 
 
 # Metric - Batch processing frequency
@@ -534,6 +602,124 @@ metric_frequency <- function(activity_log_with_batches, act, res, type_of_batch,
 }
 
 
+#####################################end Batch processing frequency
+
+##################################metric Batch size functions
+
+
+#' get_batch_types
+#'
+#' @param res_log
+#'
+#' @return returns batch types that are found in the result log
+#' @export
+#'
+#' @examples
+get_batch_types <- function(res_log) {
+
+  onlyBatchTypes <- res_log %>% filter(!is.na(batch_type))
+
+  res <-  unique(onlyBatchTypes[, "batch_type"])
+
+  return (res)
+
+}
+
+# i.e. call x <- get_act_for_specific_batch_type(get_batch_types(res_log = result_log)[1]) = B,C
+
+#' get_act_for_specific_batch_type
+#'
+#' @param my_batch_type
+#'
+#' @return gets for a specific batch types all the activites
+#' @export
+#'
+#' @examples
+get_act_for_specific_batch_type <- function(my_batch_type) {
+
+  onlyBatchActivities <- result_log %>% filter(batch_type == my_batch_type)
+
+  res <-  unique(onlyBatchActivities[, "activity"])
+
+
+  return(res)
+
+
+}
+
+
+#' batch size fun optimized for use in shiny app
+#'
+#' @param activity_log_with_batches
+#' @param act
+#' @param type_of_batch
+#' @param exclude_singletons
+#' @importFrom dplyr summarize
+#'
+#' @return
+#' @export
+#'
+#' @examples
+shiny_metric_batch_size <- function(activity_log_with_batches, act, type_of_batch, exclude_singletons = TRUE){
+
+  # Select relevant activity instances
+  ra_selection <- as.data.frame(activity_log_with_batches %>% filter(activity == act))
+
+  # Determine batch sizes (batches with size > 1)
+  batch_sizes <- (as.data.frame(ra_selection %>% filter(batch_type == type_of_batch) %>% group_by(batch_number) %>% summarize(size=n())))$size
+
+  if(exclude_singletons == FALSE){
+    n_singl_groups <- nrow(ra_selection) - as.numeric(nrow(as.data.frame(ra_selection %>% filter(batch_type == type_of_batch))))
+    batch_sizes <- c(batch_sizes, rep(1, n_singl_groups))
+  }
+
+  # Determine summary statistics
+  if(length(batch_sizes) > 0){
+    sumstats <- c(mean(batch_sizes), median(batch_sizes), sd(batch_sizes), min(batch_sizes), max(batch_sizes),
+                  as.numeric(quantile(batch_sizes, 0.25)), as.numeric(quantile(batch_sizes, 0.75)))
+  } else{
+    sumstats <- c(NA, NA, NA, NA, NA, NA, NA)
+  }
+
+  #names(sumstats) <- c("mean", "median", "sd", "min", "max", "q1", "q3")
+
+  return(sumstats)
+}
+
+#' batch_size_stats_as_data_frame
+#'
+#' @return data frame for shiny app that shows for every batch type the corresponiding activity and its size metrics(mean , median)
+#' @export
+#'
+#' @examples
+batch_size_stats_as_data_frame <- function() {
+
+  mylist <- c()
+  #Create an empty data frame
+  df <- data.frame(batch_type=character(), activity=character(), mean=double(), median = double())
+
+
+  for (b_type in get_batch_types(result_log)) {
+    for (b_act in get_act_for_specific_batch_type(b_type)) {
+      size_stats <- shiny_metric_batch_size(result_log,b_act,b_type)
+      mylist <- list(batch_type = b_type, activity = b_act, mean = size_stats[1], median = size_stats[2])
+      df = rbind(df,mylist, stringsAsFactors=FALSE)
+
+    }
+  }
+
+
+
+  #code to convert list into df
+
+  #change to df
+  return(df)
+
+
+
+}
+
+######################### batch size end
 
 # Metric - Batch size
 
@@ -652,7 +838,95 @@ metric_activity_duration <- function(activity_log_with_batches, act, res, type_o
 
   return(sumstats)
 }
+############################################waiting time##############
 
+
+#' batch_waiting_time_to_data_frame
+#'
+#' @return
+#' @export
+#'
+#' @examples
+batch_waiting_time_to_data_frame <- function(){
+
+  mylist <- c()
+  #Create an empty data frame
+  df <- data.frame(batch_type=character(), activity=character(), batch_waiting_time=double())
+
+
+  for (b_type in get_batch_types(result_log)) {
+    for (b_act in get_act_for_specific_batch_type(b_type)) {
+      size_stats <- shiny_metric_waiting_time(result_log,b_act,b_type)
+      mylist <- list(batch_type = b_type, activity = b_act, batch_waiting_time = size_stats[1])
+      df = rbind(df,mylist, stringsAsFactors=FALSE)
+
+    }
+  }
+
+  return(df)
+
+}
+
+
+#' shiny_metric_waiting_time
+#'
+#' @param activity_log_with_batches
+#' @param act
+#' @param type_of_batch
+#'
+#'
+#' @importFrom lubridate is.POSIXct
+#' @return
+#' @export
+#'
+#' @examples
+shiny_metric_waiting_time <- function(activity_log_with_batches, act,  type_of_batch){
+
+  # Select relevant activity instances
+  ra_selection <- as.data.frame(activity_log_with_batches %>% filter(activity == act))
+
+  # Determine (when possible) the waiting times
+  if("arrival" %in% names(ra_selection) & !is.na(ra_selection$arrival[1])){
+
+    # Calculate waiting time
+    if(is.numeric(ra_selection$arrival) & is.numeric(ra_selection$start)){
+      ra_selection$wt <- ra_selection$start - ra_selection$arrival
+    } else if(is.POSIXct(ra_selection$arrival) & is.POSIXct(ra_selection$start)){
+      ra_selection$wt <- as.numeric(difftime(ra_selection$start, ra_selection$arrival, units = "hours"))
+    } else{
+      stop("Metric waiting time - Timestamp formats should be numeric or POSIXct")
+    }
+
+    # Determine waiting time summary statistics for batched cases
+    batched_cases_wt <- (as.data.frame(ra_selection %>% filter(batch_type == type_of_batch)))$wt
+    if(length(batched_cases_wt) > 0){
+      sumstats <- c(mean(batched_cases_wt), median(batched_cases_wt), sd(batched_cases_wt), min(batched_cases_wt), max(batched_cases_wt),
+                    as.numeric(quantile(batched_cases_wt, 0.25)), as.numeric(quantile(batched_cases_wt, 0.75)))
+    } else{
+      sumstats <- c(NA, NA, NA, NA, NA, NA, NA)
+    }
+
+    # Determine waiting time summary statistics for non-batched cases
+    non_batched_cases_wt <- ra_selection[-which(ra_selection$batch_type == type_of_batch),"wt"]
+    if(length(non_batched_cases_wt) > 0){
+      sumstats <- c(sumstats, mean(non_batched_cases_wt), median(non_batched_cases_wt), sd(non_batched_cases_wt), min(non_batched_cases_wt), max(non_batched_cases_wt),
+                    as.numeric(quantile(non_batched_cases_wt, 0.25)), as.numeric(quantile(non_batched_cases_wt, 0.75)))
+    } else{
+      sumstats <- c(sumstats, NA, NA, NA, NA, NA, NA, NA)
+    }
+
+
+  } else{
+    # Activity log does not contain arrival times. As a consequence, waiting times cannot be calculated
+    sumstats <- c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA)
+  }
+
+  # Rename sumstats entries
+  names(sumstats) = c("b_mean", "b_median", "b_sd", "b_min", "b_max", "b_q1", "b_q3",
+                      "nb_mean", "nb_median", "nb_sd", "nb_min", "nb_max", "nb_q1", "nb_q3")
+
+  return(sumstats)
+}
 
 # Metric - Waiting time
 
@@ -835,3 +1109,62 @@ metric_overlap_concurrent_cases <- function(activity_log_with_batches, act, res)
 
   return(sumstats)
 }
+
+
+############create recommendations
+
+#get the vals out of matrix which row shows median -> 5r -> https://stackoverflow.com/questions/28173284/extract-statistics-from-boxplot
+
+
+#' get_metric_stats
+#'
+#' @param metric_fun metric function like compare_processing_time(bplot = FALSE) as example
+#'
+#' @return returns the median of all batch types and safes in a c(parallel,seq,conc, noBatch)
+#' @export
+#'
+#' @examples
+get_metric_stats <- function(metric_fun){
+  p <- metric_fun$stats[3,1]
+  s <- metric_fun$stats[3,2]
+  c <- metric_fun$stats[3,3]
+  #np <- metric_fun$stats[3,4]
+  return(c(p,s,c))
+}
+
+#' create_recommendations
+#'
+#' @param metricStats
+#'
+#' @return recommendation for specific metric how to proceed with process as string
+#' @export
+#'
+#' @examples
+create_recommendations <- function(metricStats){
+  minTime <- min(metricStats)
+  minPos <- which.min(minTime)
+
+  batch_Type <- NULL
+
+  if(minPos == 1){
+
+    batch_Type <- "PARALLEL"
+
+  }else if(minPos == 2){
+
+    batch_Type <- "SEQUENTIAL"
+
+  }else if(minPos == 3){
+
+    batch_Type <- "CONCURRENT"
+
+  }else{
+
+    print("np")
+
+  }
+  return( paste("With a time of: ", paste( round(minTime,3), paste(" +++days+++ and a Batch type of: ", paste(batch_Type, paste(" , the Processtime would be improved by (around : whole Process time here)")) ))))
+
+}
+
+

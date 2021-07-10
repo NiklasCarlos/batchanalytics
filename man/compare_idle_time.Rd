@@ -4,7 +4,7 @@
 \alias{compare_idle_time}
 \title{compare idle times}
 \usage{
-compare_idle_time()
+compare_idle_time(bplot = TRUE)
 }
 \value{
 

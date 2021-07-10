@@ -4,7 +4,7 @@
 \alias{compare_throughput_time}
 \title{compare troughput time}
 \usage{
-compare_throughput_time()
+compare_throughput_time(bplot = TRUE)
 }
 \value{
 

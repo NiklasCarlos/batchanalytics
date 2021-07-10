@@ -2,7 +2,8 @@
 % Please edit documentation in R/metricsBatchAnalytics.R
 \name{compare_throughput_time_of_activites}
 \alias{compare_throughput_time_of_activites}
-\title{compare throughput time for each batching type and see activity duration}
+\title{compare throughput time for each batching type and see activity duration
+https://stackoverflow.com/questions/14604439/plot-multiple-boxplot-in-one-graph}
 \usage{
 compare_throughput_time_of_activites()
 }
@@ -11,4 +12,5 @@ ggplot boxplot
 }
 \description{
 compare throughput time for each batching type and see activity duration
+https://stackoverflow.com/questions/14604439/plot-multiple-boxplot-in-one-graph
 }

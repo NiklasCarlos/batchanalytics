@@ -12,3 +12,6 @@ activities that use batching
 \description{
 show dataframe with  activities use batching
 }
+\details{
+get_batching_activities_for_each_type methode is usallz the liste parameter
+}

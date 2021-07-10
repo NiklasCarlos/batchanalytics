@@ -4,7 +4,7 @@
 \alias{compare_processing_time}
 \title{compare processing time}
 \usage{
-compare_processing_time()
+compare_processing_time(bplot = TRUE)
 }
 \value{
 

@@ -100,9 +100,56 @@ shinyServer(function(input, output) {
                 return(result_log)
             }
 
+        }else if(input$funcTable == "metric_batch_size") {
+            return(batch_size_stats_as_data_frame())
+        }else if(input$funcTable == "metric_waiting_times") {
+            return(batch_waiting_time_to_data_frame())
+        } else if(input$funcTable == "metric_batch_frequency") {
+            return(batch_frequency_to_dataframe())
         }
 
 
+    })
+
+    ###reactive txtoutputs
+    output$selected_fun <- renderText({
+        paste("You have selected : ", input$funcTable)
+    })
+
+    output$selected_fun_plot <- renderText({
+        paste("You have selected : ", input$funcPlot)
+    })
+
+    #fun explanations for tables
+    #explain form bupaR and explain graph -> shows bla with time x achse in min etc
+    output$selected_fun_explanation <- renderText({
+
+        if(input$funcPlot == "compare_throughput_time") {
+
+            return("throughput time: the time between the very first event of the case and the very last")
+
+        }else if(input$funcPlot == "compare_processing_time"){
+
+            return("processing time: the sum of the duration of all activity instances")
+
+
+        }else  if(input$funcPlot == "compare_idle_time"){
+            return("idle time: the time when no activity instance is active")
+        }else if(input$funcPlot == "show_batching_in_process_map"){
+            return("test expl")
+        }else if(input$funcPlot == "compare_processing_time_of_activites"){
+            return("shows for every activity specifically how long the process time was at this part of process")
+
+
+
+
+        }else if(input$funcPlot == "compare_throughput_time_of_activites"){
+
+            return("shows for every activity specifically how long the process time was at this part of process")
+
+
+
+        }
 
     })
 
@@ -152,6 +199,52 @@ shinyServer(function(input, output) {
 
     })
 
+    ###table output for plotting
+    #str shift c for commenting
+    # output$result_plot <- renderTable({
+    #     print("check condition plot")
+    #
+    #     # input$file1 will be NULL initially. After the user selects
+    #     # and uploads a file, head of that data file by default,
+    #     # or all rows if selected, will be shown.
+    #
+    #     req(ready)
+    #
+    #     #init_elog_transformation()
+    #     print("in plot")
+    #     #"show_batching_in_process_map", "compare_throughput_time", "compare_processing_time" , "metric_batch_size"
+    #     if(input$funcPlot == "compare_throughput_time") {
+    #         print("in if plot")
+    #
+    #         compare_throughput_time()
+    #
+    #     }else if(input$funcPlot == "compare_processing_time"){
+    #
+    #         compare_processing_time()
+    #
+    #
+    #     }else  if(input$funcPlot == "compare_idle_time"){
+    #         compare_idle_time()
+    #     }else if(input$funcPlot == "show_batching_in_process_map"){
+    #         #grViz( show_batching_in_process_map())
+    #     }else if(input$funcPlot == "compare_processing_time_of_activites"){
+    #         #grViz( show_batching_in_process_map())
+    #         compare_processing_time_of_activites()
+    #
+    #
+    #
+    #     }else if(input$funcPlot == "compare_throughput_time_of_activites"){
+    #         #grViz( show_batching_in_process_map())
+    #         compare_throughput_time_of_activites()
+    #
+    #
+    #
+    #     }
+    #
+    #
+    # })
+
+
     #graph outputs
     output$process_map <- renderGrViz({
 
@@ -178,10 +271,36 @@ shinyServer(function(input, output) {
 
     #recommendations
 
+    output$rec_metric_processTime <- renderText({
+        req(ready)
+
+        create_recommendations(get_metric_stats(compare_processing_time(bplot = FALSE)))
+
+    })
+
+
+    output$rec_metric_throughputTime <- renderText({
+        req(ready)
+
+        create_recommendations(get_metric_stats(compare_throughput_time(bplot = FALSE)))
+
+    })
+
+    output$rec_metric_idleTime <- renderText({
+        req(ready)
+
+        create_recommendations(get_metric_stats(compare_idle_time(bplot = FALSE)))
+
+    })
+
+
     output$recommendation <- renderTable({
 
        return(c("1. ddk", "2.kdkdk"))
     })
+
+
+
 
 
 
