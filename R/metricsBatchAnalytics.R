@@ -1163,8 +1163,23 @@ create_recommendations <- function(metricStats){
     print("np")
 
   }
-  return( paste("With a time of: ", paste( round(minTime,3), paste(" +++days+++ and a Batch type of: ", paste(batch_Type, paste(" , the Processtime would be improved by (around : whole Process time here)")) ))))
+
+  res <- list(minTime,batch_Type)
+
+  return(res)
+
+  # return( paste("With a time of: ", paste( round(minTime,3), paste(" +++days+++ and a Batch type of: ", paste(batch_Type, paste(" , the Processtime would be improved by (around : whole Process time here)")) ))))
 
 }
+
+
+
+
+#give two process times(optimal sol vs avg functime with everything) and function retruns how much faster the optimal solution is
+#process_advantage_percent <- function(){}
+
+#function to compare a metric with specific batchtype to its avg time so the time advangtage can be calculated
+#avgprocessTime-<
+
 
 

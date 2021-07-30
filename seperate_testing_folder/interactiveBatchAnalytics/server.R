@@ -274,7 +274,12 @@ shinyServer(function(input, output) {
     output$rec_metric_processTime <- renderText({
         req(ready)
 
-        create_recommendations(get_metric_stats(compare_processing_time(bplot = FALSE)))
+      resList <-  create_recommendations(get_metric_stats(compare_processing_time(bplot = FALSE)))
+
+        #take string and add processtime
+
+        return(       paste("With a time of: ", paste( round(resList[[1]],3), paste(" +++days+++ and a Batch type of: ", paste(resList[2], paste(" , the Processtime would be improved by (around : whole Process time here)")) )))
+)
 
     })
 
@@ -282,14 +287,25 @@ shinyServer(function(input, output) {
     output$rec_metric_throughputTime <- renderText({
         req(ready)
 
+        #string equals result of res <- create_rec
         create_recommendations(get_metric_stats(compare_throughput_time(bplot = FALSE)))
+        #take string and add processtime
+        resList <-    create_recommendations(get_metric_stats(compare_throughput_time(bplot = FALSE)))
+
+
+return(        paste("With a time of: ", paste( round(resList[[1]],3), paste(" +++days+++ and a Batch type of: ", paste(resList[2], paste(" , the Processtime would be improved by (around : whole Process time here)")) )))
+)
 
     })
 
     output$rec_metric_idleTime <- renderText({
         req(ready)
 
-        create_recommendations(get_metric_stats(compare_idle_time(bplot = FALSE)))
+        #take string and add processtime
+        resList <-         create_recommendations(get_metric_stats(compare_idle_time(bplot = FALSE)))
+
+return( paste("With a time of: ", paste( round(resList[[1]],3), paste(" +++days+++ and a Batch type of: ", paste(resList[2], paste(" , the Processtime would be improved by (around : whole Process time here)")) )))
+)
 
     })
 
@@ -300,6 +316,12 @@ shinyServer(function(input, output) {
     })
 
 
+    # output$recommendationTable <- renderTable({
+    #
+    #   #für jeden batchtyp
+    #
+    #   return(data.frame(processTime, ProcessTime, WaitingTime))
+    # })
 
 
 
