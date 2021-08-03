@@ -2,7 +2,7 @@
 % Please edit documentation in R/metricsBatchAnalytics.R
 \name{compare_processing_time_of_activites}
 \alias{compare_processing_time_of_activites}
-\title{compare processing time for each batching type and see activity duration}
+\title{not in use compare processing time for each batching type and see activity duration}
 \usage{
 compare_processing_time_of_activites()
 }
@@ -10,5 +10,5 @@ compare_processing_time_of_activites()
 
 }
 \description{
-compare processing time for each batching type and see activity duration
+not in use compare processing time for each batching type and see activity duration
 }

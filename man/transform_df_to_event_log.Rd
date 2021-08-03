@@ -2,7 +2,7 @@
 % Please edit documentation in R/metricsBatchAnalytics.R
 \name{transform_df_to_event_log}
 \alias{transform_df_to_event_log}
-\title{transform data frame to event log}
+\title{transform data.frame obj of the specific batch types  to event log obj for further analysis with bupaR}
 \usage{
 transform_df_to_event_log()
 }
@@ -10,5 +10,5 @@ transform_df_to_event_log()
 creates global vars elogs for each batching type for further analysis
 }
 \description{
-transform data frame to event log
+transform data.frame obj of the specific batch types  to event log obj for further analysis with bupaR
 }

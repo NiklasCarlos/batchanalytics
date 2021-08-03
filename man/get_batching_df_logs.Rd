@@ -7,10 +7,10 @@
 get_batching_df_logs(res_log)
 }
 \arguments{
-\item{res_Log}{is the log which results form}
+\item{res_Log}{is the log which contains the results form the batchmining algorihm}
 }
 \value{
-creates global vars that contain different batching infos and can be used for further analysis
+creates global vars that contain different logs for each batch type so they can be used for further analysis
 }
 \description{
 get batching dataframes

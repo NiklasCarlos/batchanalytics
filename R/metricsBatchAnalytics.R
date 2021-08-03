@@ -3,9 +3,9 @@
 
 #' get batching dataframes
 #'
-#' @param res_Log is the log which results form
+#' @param res_Log is the log which contains the results form the batchmining algorihm
 #'
-#' @return creates global vars that contain different batching infos and can be used for further analysis
+#' @return creates global vars that contain different logs for each batch type so they can be used for further analysis
 #' @export
 #'
 #' @examples
@@ -68,7 +68,7 @@ get_batching_df_logs <- function(res_log){
 
 #tidyr gather
 
-#' transform data frame to event log
+#' transform data.frame obj of the specific batch types  to event log obj for further analysis with bupaR
 #'
 #' @return creates global vars elogs for each batching type for further analysis
 #' @export
@@ -136,7 +136,7 @@ transform_df_to_event_log <- function(){
     )
 
   #TODO
-  #elog with only noBatching cases
+  #elog containing only noBatching cases
   elogNoBatch <<- df_logNoBatch %>%
     gather(status, timestamp, start, complete)  %>% # arrival omitted , seems to be same as start
     eventlog(
@@ -264,7 +264,7 @@ cycle_time_efficiency <- function(){
 
 
 
-#' compare processing time for each batching type and see activity duration
+#' not in use compare processing time for each batching type and see activity duration
 #'
 #' @return
 #' @export
@@ -272,7 +272,7 @@ cycle_time_efficiency <- function(){
 #' @examples
 compare_processing_time_of_activites <- function(){
 
-
+#TODO _> no implmentet -> was impl as comparing each activity duration for each type with each other -< other function does it now
 
   #processing time
 
@@ -284,6 +284,8 @@ compare_processing_time_of_activites <- function(){
 
   conc <- elogConc %>%
     processing_time("activity")
+
+  #no batching here ..... same t4 <- elogNoBatch %>% processing_time("activity")
 
 
 
@@ -304,6 +306,8 @@ compare_processing_time_of_activites <- function(){
   plot(sim)
 
 }
+
+#######################metrics for ploting####################################
 
 #' compare throughput time for each batching type and see activity duration
 #' https://stackoverflow.com/questions/14604439/plot-multiple-boxplot-in-one-graph
@@ -333,8 +337,6 @@ compare_throughput_time_of_activites <- function(){
 #' @examples
 compare_processing_time <- function(bplot = TRUE){
 
-
-
   #processing time
 
   sim <- elogSim %>%
@@ -350,13 +352,16 @@ compare_processing_time <- function(bplot = TRUE){
 
   #TODO
   # no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
-  # noBatch <- elogNoBatch %>%
-  #   processing_time("log")
+  noBatch <- elogNoBatch %>% processing_time("log")
 
 
   #TODO
   #add noBatch maybe generic approach if elogs without vals
-  boxplot(sim, seq, conc,xlab = "batch type", ylab = "processing Time", names = c("parallel", "sequential", "concurrent"), plot = bplot )
+  boxplot(sim, seq, conc,noBatch ,xlab = "batch type", ylab = "processing Time", names = c("parallel", "sequential", "concurrent", "noBatch"), plot = bplot )
+
+
+  #find type with nrow = null und als print unter graph sagen das dieses verhalten nicht vorhanden ist
+
 
 
 }
