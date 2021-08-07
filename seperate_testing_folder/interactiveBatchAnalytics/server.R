@@ -287,8 +287,7 @@ shinyServer(function(input, output) {
     output$rec_metric_throughputTime <- renderText({
         req(ready)
 
-        #string equals result of res <- create_rec
-        create_recommendations(get_metric_stats(compare_throughput_time(bplot = FALSE)))
+        #string equals result of res <- create_rec_create_recommendations(get_metric_stats(compare_throughput_time(bplot = FALSE)))
         #take string and add processtime
         resList <-    create_recommendations(get_metric_stats(compare_throughput_time(bplot = FALSE)))
 

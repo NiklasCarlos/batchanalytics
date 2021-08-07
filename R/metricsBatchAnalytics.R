@@ -380,33 +380,42 @@ compare_processing_time <- function(bplot = TRUE){
 #' @examples
 compare_idle_time <- function(bplot = TRUE){
 
-  #TODO
-  # no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
 
 
-  # create this as new method -> aber auch daran denken das "no batching" eine option ist
-  # modularer aufbau der funktionen
+  sim <- elogSim %>% get_idle_time
+  seq <- elogSeq %>% get_idle_time
+
+  conc <- elogConc %>% get_idle_time
+
+  noBatch <- elogNoBatch %>% get_idle_time
 
 
-  sim <- elogSim %>%
-    idle_time("log", units = "days")
 
-  seq <- elogSeq %>%
-    idle_time("log", units = "days")
 
-  conc <- elogConc %>%
-    idle_time("log", units = "days")
-  #
-  # #TODO
-  # # no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
-  # # noBatch <- elogNoBatch %>%
-  # #   idle_time("log", units = "days")
-  #
-  boxplot(sim, seq, conc,xlab = "batch type", ylab = "idle Time", names = c("parallel", "sequential", "concurrent") , plot = bplot )
+  boxplot(sim, seq, conc, noBatch,xlab = "batch type", ylab = "idle Time", names = c("parallel", "sequential", "concurrent", "noBatch") , plot = bplot )
 
 }
 
+#' get_idle_time
+#' helper FUN for getting idle time(solve the elog cant be empty problem with replacing null)
+#'
+#' @param elog
+#'
+#' @return idle time
+#' @export
+#'
+#' @examples
+get_idle_time <- function(elog){
 
+  if(nrow(elog) > 0){
+
+    return( elog %>% idle_time("log", units = "days"))
+  }else{
+    return  (NULL)
+
+  }
+
+}
 
 
 
@@ -417,28 +426,21 @@ compare_idle_time <- function(bplot = TRUE){
 #'
 #' @examples
 compare_throughput_time <- function(bplot = TRUE){
-  #
-  #   print("hi gllgl")
-  #
-    sim <- elogSim %>%
-      throughput_time("log")
 
 
-    seq <- elogSeq %>%
-      throughput_time("log")
+  sim <- elogSim %>%
+    throughput_time("log")
 
-    conc <- elogConc %>%
-      throughput_time("log")
-  #
-  #   #TODO
-  #   # no -batching case einfügen und generische zeichen methode je nachdem welches batching verhalten vorhanden ist in den daten -> c( names ) variert <----
-  #   # noBatch <- elogNoBatch %>%
-  #   #   throughput_time("log")
-  #
-  #
-  #
-  #
-    boxplot(sim, seq, conc,xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent"), plot = bplot  )
+
+  seq <- elogSeq %>%
+    throughput_time("log")
+
+  conc <- elogConc %>%
+    throughput_time("log")
+
+  noBatch <- elogNoBatch %>%  throughput_time("log")
+
+  boxplot(sim, seq, conc,noBatch, xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent","noBatch"), plot = bplot  )
 
 }
 
@@ -1133,8 +1135,8 @@ get_metric_stats <- function(metric_fun){
   p <- metric_fun$stats[3,1]
   s <- metric_fun$stats[3,2]
   c <- metric_fun$stats[3,3]
-  #np <- metric_fun$stats[3,4]
-  return(c(p,s,c))
+  nb <- metric_fun$stats[3,4]
+  return(c(p,s,c,nb))
 }
 
 #' create_recommendations
@@ -1146,7 +1148,16 @@ get_metric_stats <- function(metric_fun){
 #'
 #' @examples
 create_recommendations <- function(metricStats){
+
+  #replace na with inf if batch types are not existing in data set
+  #> v1 <- replace(v1,is.na(v1),Inf)
+  metricStats <- replace(metricStats,is.na(metricStats),Inf)
+
+
   minTime <- min(metricStats)
+
+
+
   minPos <- which.min(minTime)
 
   batch_Type <- NULL
@@ -1163,18 +1174,19 @@ create_recommendations <- function(metricStats){
 
     batch_Type <- "CONCURRENT"
 
+  }else if(minPos == 4){
+
+    batch_Type <- "NO BATCHING"
+
   }else{
+    print("position not found")
 
-    print("np")
-
+    batch_Type <- "NO INFO check data"
   }
 
   res <- list(minTime,batch_Type)
 
   return(res)
-
-  # return( paste("With a time of: ", paste( round(minTime,3), paste(" +++days+++ and a Batch type of: ", paste(batch_Type, paste(" , the Processtime would be improved by (around : whole Process time here)")) ))))
-
 }
 
 
