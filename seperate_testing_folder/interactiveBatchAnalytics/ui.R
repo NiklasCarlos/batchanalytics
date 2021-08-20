@@ -42,7 +42,7 @@ shinyUI(fluidPage(
             # evtl auch eine compare throughput etc implementieren die das boxplot in zahlen ausgeben
             #choices= lsf.str("package:batchanalytics") war vorher c(val1,val2 etc), lsf.str("package:batchanalytics") lists all functions of a package
             selectInput("funcTable", "Choose function:",
-                        choices= c("show_summary",   "metric_batch_size","metric_batch_frequency" ,"metric_waiting_times", "compare_processing_time"  )),
+                        choices= c("show_summary",   "metric_batch_size","metric_batch_frequency" ,"metric_waiting_times", "cycle_time_efficiency"  )),
 
             #TODO
             #input val widget necessary

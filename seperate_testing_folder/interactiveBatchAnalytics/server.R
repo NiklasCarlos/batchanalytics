@@ -106,6 +106,8 @@ shinyServer(function(input, output) {
             return(batch_waiting_time_to_data_frame())
         } else if(input$funcTable == "metric_batch_frequency") {
             return(batch_frequency_to_dataframe())
+        }else if(input$funcTable == "cycle_time_efficiency") {
+          return(cycle_time_efficiency())
         }
 
 
