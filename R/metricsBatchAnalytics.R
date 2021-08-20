@@ -316,7 +316,7 @@ compare_processing_time_of_activites <- function(){
 #' @export
 #'
 #' @examples
-compare_throughput_time_of_activites <- function(){
+compare_throughput_time_of_each_activites <- function(){
 
   res_with_throughput_Time <- result_log
 

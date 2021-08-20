@@ -50,7 +50,7 @@ shinyUI(fluidPage(
             hr(),
 
             selectInput("funcPlot", "Choose function for ploting:",
-                        choices= c("compare_throughput_time", "compare_processing_time" , "compare_idle_time","show_batching_in_process_map", "compare_processing_time_of_activites", "compare_throughput_time_of_activites" )),
+                        choices= c("compare_throughput_time", "compare_processing_time" , "compare_idle_time","show_batching_in_process_map", "compare_processing_time_of_activites", "compare_processing_time_of_each_activity" )),
 
             hr(),
 

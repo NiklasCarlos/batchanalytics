@@ -143,9 +143,9 @@ shinyServer(function(input, output) {
 
 
 
-        }else if(input$funcPlot == "compare_throughput_time_of_activites"){
+        }else if(input$funcPlot == "compare_processing_time_of_each_activity"){
 
-            return("shows for every activity specifically how long the process time was at this part of process")
+            return("shows for every activity specifically how long the process time was at this part of process for each activity compared to all other batch types")
 
 
 
@@ -185,12 +185,13 @@ shinyServer(function(input, output) {
         }else if(input$funcPlot == "compare_processing_time_of_activites"){
             #grViz( show_batching_in_process_map())
             compare_processing_time_of_activites()
+            #only bupar function for one batch type
+          #TODO
 
 
-
-        }else if(input$funcPlot == "compare_throughput_time_of_activites"){
+        }else if(input$funcPlot == "compare_processing_time_of_each_activity"){
             #grViz( show_batching_in_process_map())
-            compare_throughput_time_of_activites()
+            compare_processing_time_of_each_activity()
 
 
 
