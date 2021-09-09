@@ -107,7 +107,11 @@ shinyServer(function(input, output) {
         } else if(input$funcTable == "metric_batch_frequency") {
             return(batch_frequency_to_dataframe())
         }else if(input$funcTable == "cycle_time_efficiency") {
-          return(cycle_time_efficiency())
+
+          c<- cycle_time_efficiency()
+
+
+          return(data.frame("median" = c[3], "mean" = c[4] ))
         }
 
 
