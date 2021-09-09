@@ -1,0 +1,249 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+```{r setup}
+
+library(batchanalytics)
+library(bupaR)
+library(bamalog)
+library(tidyr) # warum brauche ich das noch für gather aber die anderen package(bama) nicht mehr da imported mit package batchAanalytics---
+
+
+```
+
+Load sample eventlog 
+
+
+```{r}
+
+csv = system.file("exdata", "sample_data_1.csv", package = "batchanalytics")
+
+csv_log = read.csv(csv)
+
+task_log <- csv_log
+
+
+```
+
+
+detect batching behaviour and create a task log
+
+add documentation why seq_list
+
+```{r}
+
+
+result_log <- my_detect_batching(task_log)
+
+
+
+```
+
+```{r}
+#code refacor df_list
+#1 ersetzen
+
+#df_lists <- get_batching_df_logs(result_log)
+
+get_batching_df_logs(result_log)
+
+
+```
+
+
+
+
+
+
+
+###batch processing metrics
+
+```{r}
+# transformation to event_logs
+#2 unterer code ersetzten
+
+transform_df_to_event_log()
+
+```
+
+
+
+
+
+
+
+##show process model with batching behaviour
+
+```{r}
+
+# create this as new method -> aber auch daran denken das "no batching" eine option ist 
+
+
+show_batching_in_process_map()
+
+
+
+#identfy which activites are performed with batching behaviour and if possible highlight in output graph or give an additional text output
+
+```
+
+
+
+
+
+## Cycle Time
+
+The throughput time is the time form the very first event to the last event of a case. The levels at which it can be computed are log, trace, or case.
+
+(overall cycle time, see pic bupR waiting time included)
+
+
+```{r}
+
+
+#evtl nicht nögig
+
+
+#cycle time function without bupaR
+
+
+#view github implementation of bupaR 
+# compare to niels function implementation
+
+#result_log %>% group_by("case_id") %>% 
+
+
+```
+
+
+
+```{r}
+
+# create this as new method -> aber auch daran denken das "no batching" eine option ist 
+
+
+
+
+#when writing method consider that not always all batch types are included and also no batching possible -> when plotting and creating boxplot create a generic approach#
+
+
+# für modularität keep event log cration seperate from other functions 
+
+#evtl cycle time selber funktion ohne event log schreiben -> von jeden case start - endzeit (groubby case , start - end , -> mean() an niels orientieren) ähnlich für processing time -< vorher #ABER data spliten in "nobatching " vs andere batch types
+
+
+compare_throughput_time()
+
+
+
+```
+
+
+
+
+##processing time
+processing time: the sum of the duration of all activity instances[bupaR]
+
+
+```{r}
+
+
+
+# create this as new method -> aber auch daran denken das "no batching" eine option ist 
+# modularer aufbau der funktionen
+
+
+compare_processing_time() # warum global env und nicht function
+
+
+```
+
+
+#idle time
+idle time: the time when no activity instance is active
+
+
+
+```{r}
+
+
+compare_idle_time()
+
+ 
+
+
+```
+
+
+#Metric cycle time efficiency
+Ratio of overall processing time relative to the overall cycle time
+
+
+```{r}
+#cycle time efficiency
+
+
+# create this as new method -> aber auch daran denken das "no batching" eine option ist 
+# modularer aufbau der funktionen
+
+
+
+# processing time / throughput time
+
+
+cycle_time_efficiency()
+
+
+
+```
+
+
+
+##metric batch frequency
+
+This metrics shows .....
+
+```{r}
+#test batch frequency
+
+
+
+metric_frequency(result_log, "B", "WorkerB_#0", "concurrent", FALSE )
+```
+
+
+
+```{r}
+
+#test batch size
+#metric_frequency(result_log, "Registration", "r1", "concurrent", FALSE )
+
+metric_batch_size(result_log, "B", "WorkerB_#0", "concurrent", exclude_singletons = TRUE)
+
+```
+
+
+
+```{r}
+# Metric - Activity duration
+metric_activity_duration(result_log, "B", "WorkerB_#0", "concurrent")
+
+
+
+```
+```{r}
+
+#create event log for bupaR
+
+  #result_log %>% eventlog( case_id = "case_id", activity_id = "activity")
+
+
+```
+
+
+
