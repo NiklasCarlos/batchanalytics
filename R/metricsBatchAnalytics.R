@@ -709,7 +709,7 @@ batch_size_stats_as_data_frame <- function() {
   for (b_type in get_batch_types(result_log)) {
     for (b_act in get_act_for_specific_batch_type(b_type)) {
       size_stats <- shiny_metric_batch_size(result_log,b_act,b_type)
-      mylist <- list(batch_type = b_type, activity = b_act, mean = size_stats[1], median = size_stats[2])
+      mylist <- list(batch_type = b_type, activity = b_act, mean = round(size_stats[1]), median = round(size_stats[2]))
       df = rbind(df,mylist, stringsAsFactors=FALSE)
 
     }
