@@ -43,8 +43,9 @@ get_batching_df_logs <- function(res_log){
   #alternative look for is.na in all activities of a case maybe any() not perfect here
     df_logNoBatch <<- res_log %>%
       group_by(case_id) %>%
-      filter( all((batch_type != "concurrent") & (batch_type != "sequential") & (batch_type != "simultaneous") )) %>% arrange(case_id)
-  # print("dfno batch")
+      filter(is.na(batch_type)) %>% arrange(case_id)
+
+    print("dfno batch")
   #TODO
   #df_log_noBatching
 
@@ -178,7 +179,7 @@ get_batching_activities <- function(){
 #'
 #'show dataframe with  activities use batching
 #'
-#'get_batching_activities_for_each_type methode is usallz the liste parameter
+#'get_batching_activities_for_each_type methode is usually the liste parameter
 #'
 #' @return activities that use batching
 #' @export
@@ -193,14 +194,17 @@ show_dataFrame_with_batching_activities <- function(liste){
   simultan <- liste[[1]]
   sequential <- liste[[2]]
   conc <- liste[[3]]
-
+  nobatch <- liste[[4]]
 
   sim_col <- batching_act %in% simultan
   seq_col <- batching_act %in% sequential
   conc_col <- batching_act %in% conc
+  nobatch_col <- batching_act %in% nobatch
+  #nobatch
 
 
-  mydataFrame <- data.frame(activity = batching_act, simultaneous = sim_col, sequential = seq_col,concurrent = conc_col)
+    #addnobatch
+  mydataFrame <- data.frame(activity = batching_act, Parallel = sim_col, Sequential = seq_col,Concurrent = conc_col, NoBatching = nobatch_col)
 
 
   return(mydataFrame)
@@ -228,14 +232,15 @@ get_batching_activities_for_each_type <- function(){
   sim <- onlyBatchActivities %>% filter(batch_type == "simultaneous")
   seq <- onlyBatchActivities %>% filter(batch_type == "sequential")
   conc <- onlyBatchActivities %>% filter(batch_type == "concurrent")
-
+  #new
+  nobatch <- result_log %>% filter(is.na(batch_type))
 
   resSim <-  unique(sim[, "activity"])
   resSeq <-  unique(seq[, "activity"])
   resConc <-  unique(conc[, "activity"])
+  resnobatch <- unique(nobatch[, "activity"])
 
-
-  return(list(resSim,resSeq,resConc))
+  return(list(resSim,resSeq,resConc,resnobatch))
 
 }
 
