@@ -1,0 +1,212 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+```{r}
+
+
+#load packages
+library(batchanalytics)
+library(bupaR)
+library(bamalog)
+library(tidyr)
+library(readr)
+library(lubridate)
+
+
+
+
+```
+
+```{r}
+
+
+#patients artificial but start and end times
+
+
+#sepsis, roadtraffic,
+
+#df <- patients
+
+#df <- sepsis
+
+#df <- hospital_billing
+
+df <- traffic_fines
+
+
+#check the batch_anayltics sample for different read in from so after git import everyone can use this -> no path visible
+#setwd("C:\\Users\\Niklas\\Desktop\\BachelorArbeit\\EventLogs\\real_world_event_logs")
+
+#lib batch ana verwenden - check ob neuster stand
+
+
+
+#csv_log <- read.csv("1k_Filtered data of BPI Challenge 2017.csv")
+
+
+
+#print(head(csv_log))
+
+
+```
+
+
+
+
+
+```{r}
+
+#adding timestamp cols
+
+df$arrival <- as.POSIXct(df$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "GMT") 
+
+
+
+df$start <- as.POSIXct(df$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "GMT") 
+df$complete <-  as.POSIXct(df$timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "GMT")
+
+
+
+head(df)
+
+```
+```{r}
+names(df)
+```
+
+
+```{r}
+
+
+#"case_id","activity","resource","arrival","start","complete","instance_id" und lifecycle
+
+#create new table
+
+newtable <- cbind( df[1], df[2],df[4], df[19], df[20], df[5],df[17], df[3])
+head(newtable)
+
+
+```
+
+```{r}
+#add arrival col with minus 5 min from start -< posixct = seconds from..
+
+newtable$arrival <- as.POSIXct(df$arrival - 10*60 )
+
+newtable$start <- as.POSIXct(df$start - 5*60 )
+
+
+head(newtable)
+
+```
+
+```{r}
+#filter most frequent cases
+
+t1 <- newtable %>% eventlog(
+        case_id = "case_id",
+        activity_id = "activity",
+        activity_instance_id = "activity_instance_id",
+        lifecycle_id = "lifecycle",
+        timestamp = "timestamp",#vorher complete
+        resource_id = "resource"
+    )  %>% filter_trace_frequency(percentage = 0.15)
+
+
+
+
+```
+
+
+
+
+
+
+
+###evaluate batching
+
+
+```{r}
+#create data frame format names(task_log) <- c("case_id", "activity", "resource", "arrival", "start", "complete","instance_id" )
+
+task_log <- cbind( t1[1], t1[2],t1[3], t1[4], t1[5], t1[6],t1[7])
+
+head(task_log)
+
+
+```
+
+
+
+
+```{r}
+#convert like bipc  2017
+
+names(task_log) <- c("case_id", "activity", "resource", "arrival", "start", "complete","instance_id" )
+
+
+
+```
+
+
+
+
+```{r}
+head(t1)
+
+class(t1)
+
+#write transformed log to csv
+
+#write.csv(df, "C:\\Users\\Niklas\\Desktop\\BachelorArbeit\\EventLogs\\real_world_event_logs\\sepsis_filtered.csv", row.names = FALSE)
+
+
+
+
+#code besser in funktion -< refaktor dann kein doppelten code
+#maybe safe in gitHub -> how did i transform my event log ; creation of event log short describtion
+
+```
+
+```{r}
+# write
+
+#check before exe
+write.csv(task_log, "C:\\Users\\Niklas\\Desktop\\BachelorArbeit\\EventLogs\\real_world_event_logs\\traffic.csv", row.names = FALSE)
+
+
+```
+
+```{r}
+setwd("C:\\Users\\Niklas\\Desktop\\BachelorArbeit\\EventLogs\\real_world_event_logs")
+
+
+csv_log <- read.csv("traffic_fines_ready_for_analysis.csv")
+
+#class(csv_log)
+
+
+```
+```{r}
+#fix na vals issue
+csv_log$resource[is.na(csv_log$resource)] <- "ResX"
+
+
+head(csv_log)
+```
+
+
+```{r}
+# write
+
+#check before exe
+write.csv(csv_log, "C:\\Users\\Niklas\\Desktop\\BachelorArbeit\\EventLogs\\real_world_event_logs\\traffic_fines_ready_for_analysis.csv", row.names = FALSE)
+
+
+```
+
+#check bama reading
+

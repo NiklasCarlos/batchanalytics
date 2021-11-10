@@ -78,7 +78,7 @@ shinyUI(fluidPage(
                       tabPanel("Summary",textOutput("selected_fun"),hr(), tableOutput("result"),hr(),p("Process Overview:"),grVizOutput("process_map"), p("Activities that show batching behaviour:"), tableOutput("batch_activities")),
                       tabPanel("Plot",textOutput("selected_fun_plot"),hr(), plotOutput("plot"),hr(),tableOutput("result_plot"),hr(), textOutput("selected_fun_explanation")),
                     #rec have also table at the end which is not used at moment-> show rec in bar chart wich one can safe most time
-                     tabPanel("Recommendations", h3("recommendations from all metrics: "),hr(),h6("Recommendation for optimal processing time: "), textOutput("rec_metric_processTime"),hr(), h6("Recommendation for optimal throughput time: "),textOutput("rec_metric_throughputTime"), hr(),h6("Recommendation for optimal idle time: "),textOutput("rec_metric_idleTime"),hr(), tableOutput("recommendation"),hr(), tableOutput("recommendationTable"))
+                     tabPanel("Recommendations", h3("recommendations from all metrics: "),hr(),h6("Recommendation for optimal processing time: "), textOutput("rec_metric_processTime"),hr(), h6("Recommendation for optimal throughput time: "),textOutput("rec_metric_throughputTime"), hr(),h6("Recommendation for optimal idle time: "),textOutput("rec_metric_idleTime"),hr(), tableOutput("recommendation"),hr(), tableOutput("recommendationTable"),hr(), tableOutput("recTableActivity"))
 
                     #  tabPanel("Process Map",p("test") )
 

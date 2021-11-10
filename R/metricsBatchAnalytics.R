@@ -1120,7 +1120,52 @@ metric_overlap_concurrent_cases <- function(activity_log_with_batches, act, res)
 
 ############create recommendations
 
+
 #get the vals out of matrix which row shows median -> 5r -> https://stackoverflow.com/questions/28173284/extract-statistics-from-boxplot
+
+
+
+#' show_most_eff_act
+#'
+#' @return df with most efficient batching behaviour for each activity
+#' @export
+#'
+#' @examples
+show_most_eff_act <- function(){
+
+  res_with_throughput_Time <- result_log
+
+  res_with_throughput_Time$Throughput_time = result_log$complete - result_log$start
+
+  res_with_throughput_Time$batch_type[is.na(res_with_throughput_Time$batch_type)] <- "no batching"
+
+ df <- aggregate(res_with_throughput_Time$Throughput_time, list(res_with_throughput_Time$activity,res_with_throughput_Time$batch_type), FUN=mean)
+
+
+  result <- df %>%
+    group_by(Group.1) %>%
+    filter(x == min(x)) %>%
+    arrange(Group.1)
+
+
+  names(result)[1]<-paste("Activity")
+  names(result)[2]<-paste("Batch Type")
+  names(result)[3]<-paste("Time")
+
+
+  return(result)
+
+}
+
+
+
+
+
+
+
+
+
+
 
 
 #' get_metric_stats

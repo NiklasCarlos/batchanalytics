@@ -320,6 +320,10 @@ return( paste("With a time of: ", paste( round(resList[[1]],3), paste(" +++days+
        return(c("1. ddk", "2.kdkdk"))
     })
 
+   output$recTableActivity <- renderTable({
+     return( show_most_eff_act())
+   })
+
 
     # output$recommendationTable <- renderTable({
     #

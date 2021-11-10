@@ -1,0 +1,170 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+#load packages
+library(batchanalytics)
+library(bupaR)
+library(bamalog)
+library(tidyr)
+library(readr)
+library(lubridate)
+```
+
+
+```{r}
+#read in the data
+
+#check the batch_anayltics sample for different read in from so after git import everyone can use this -> no path visible
+setwd("C:\\Users\\Niklas\\Desktop\\BachelorArbeit\\EventLogs\\real_world_event_logs")
+
+#lib batch ana verwenden - check ob neuster stand
+
+
+
+csv_log <- read.csv("Sepsis Cases - Event Log.csv")
+
+
+
+print(head(csv_log))
+```
+```{r}
+
+```
+
+
+```{r}
+#Format----> case_id,"activity","resource","arrival","start","complete","instance_id" format required
+
+
+# where resource col na vals repace with resource at the beginging
+
+
+#create start, complete col und transform timestamp into correct format
+
+
+
+
+
+#arename cols
+
+
+```
+
+```{r}
+#convert time
+
+#csv_log$ <- as.POSIXct(csv_log$Start.Timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "GMT") 
+csv_log$Complete.Timestamp <-  as.POSIXct(csv_log$Complete.Timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "GMT")
+
+#check if posxct
+head(csv_log)
+```
+
+
+
+```{r}
+#rename cols?
+
+#add fake arrivaltimes?
+
+#names(task_log) <- c("case_id", "activity", "arrival", "start", "complete", "resource", "input_batch_number", "input_batch_type")
+names(csv_log)
+```
+```{r}
+
+#insert new cols with fake times
+
+
+
+#timeConversion
+
+
+
+csv_log$arrival <- as.POSIXct(csv_log$Complete.Timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "GMT") 
+
+
+
+csv_log$start <- as.POSIXct(csv_log$Complete.Timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "GMT") 
+csv_log$complete <-  as.POSIXct(csv_log$Complete.Timestamp, format = "%Y-%m-%d %H:%M:%S", tz = "GMT")
+
+
+
+head(csv_log)
+
+```
+
+
+```{r}
+names(csv_log)
+
+```
+
+
+```{r}
+#create new table
+
+newtable <- cbind( csv_log[1], csv_log[2], csv_log[35], csv_log[36], csv_log[37])
+head(newtable)
+
+
+
+```
+
+
+
+```{r}
+#add arrival col with minus 5 min from start -< posixct = seconds from..
+
+newtable$arrival <- as.POSIXct(csv_log$Start.Timestamp - 5*60 )
+
+newtable2 <- cbind( newtable[1], newtable[2],   newtable[3],newtable[6], newtable[4],newtable[5])
+head(newtable2)
+
+```
+
+```{r}
+#add activity instance
+
+newtable2$instance_id <- 1:nrow(newtable2) 
+
+#ma <- cbind(ma, "observation"=1:nrow(ma)) 
+
+
+```
+
+
+#evtl complete daten bearbeiten weil compl = start immer
+
+
+```{r}
+task_log <- newtable2
+
+#rename cols
+names(task_log) <- c("case_id", "activity", "resource", "arrival", "start", "complete","instance_id" )
+
+
+head(task_log)
+```
+```{r}
+#write csv copy for web app
+
+#write.csv(task_log,"C:\\Users\\Niklas\\Desktop\\BachelorArbeit\\EventLogs\\real_world_event_logs\\transformedBPIC2017_event_log_ready_for_analysis.csv", row.names = FALSE)
+
+```
+
+
+```{r}
+#test 
+
+result_log <- my_detect_batching(task_log)
+
+head(result_log)
+
+```
+```{r}
+#metriken einzeln ausprobieren
+```
+
