@@ -284,7 +284,7 @@ shinyServer(function(input, output) {
 
         #take string and add processtime
 
-        return(       paste("With a time of: ", paste( round(resList[[1]],3), paste(" +++days+++ and a Batch type of: ", paste(resList[2], paste(" , the Processtime would be improved by (around : whole Process time here)")) )))
+        return(       paste("With a time of: ", paste( round(resList[[1]],3), paste(" +++days+++ and a Batch type of: ", paste(resList[2], paste(" , the Processing time would be improved by around : ",paste(resList[3],paste("percent (compared to avg time of using only other Behaviour)")))) )))
 )
 
     })
@@ -298,7 +298,7 @@ shinyServer(function(input, output) {
         resList <-    create_recommendations(get_metric_stats(compare_throughput_time(bplot = FALSE)))
 
 
-return(        paste("With a time of: ", paste( round(resList[[1]],3), paste(" +++days+++ and a Batch type of: ", paste(resList[2], paste(" , the Processtime would be improved by (around : whole Process time here)")) )))
+return(        paste("With a throughput time of: ", paste( round(resList[[1]],3), paste(" +++days+++ and a Batch type of: ", paste(resList[2], paste(" , the throughput time would be improved by", paste(resList[3],paste("percent (compared to avg time of using only other Behaviour)")))) )))
 )
 
     })
@@ -309,7 +309,7 @@ return(        paste("With a time of: ", paste( round(resList[[1]],3), paste(" +
         #take string and add processtime
         resList <-         create_recommendations(get_metric_stats(compare_idle_time(bplot = FALSE)))
 
-return( paste("With a time of: ", paste( round(resList[[1]],3), paste(" +++days+++ and a Batch type of: ", paste(resList[2], paste(" , the Processtime would be improved by (around : whole Process time here)")) )))
+return( paste("With a idle time of: ", paste( round(resList[[1]],3), paste(" +++days+++ and a Batch type of: ", paste(resList[2], paste(" , the idle time would be improved by ", paste(resList[3],paste("percent (compared to avg time of using only other Behaviour)")))) )))
 )
 
     })

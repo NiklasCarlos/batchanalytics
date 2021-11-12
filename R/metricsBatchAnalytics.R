@@ -1208,7 +1208,7 @@ create_recommendations <- function(metricStats){
 
 
 
-  minPos <- which.min(minTime)
+  minPos <- which.min(metricStats)
 
   batch_Type <- NULL
 
@@ -1234,7 +1234,13 @@ create_recommendations <- function(metricStats){
     batch_Type <- "NO INFO check data"
   }
 
-  res <- list(minTime,batch_Type)
+
+  #calculate how much faster min is compared to others
+
+  percentage <- round((1-(minTime  / mean(base::setdiff(metricStats,minTime))))*100,2)
+
+
+  res <- list(minTime,batch_Type,percentage)
 
   return(res)
 }
