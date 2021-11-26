@@ -190,13 +190,13 @@ shinyServer(function(input, output) {
             #grViz( show_batching_in_process_map())
         }else if(input$funcPlot == "compare_processing_time_of_activites"){
             #grViz( show_batching_in_process_map())
-            compare_processing_time_of_activites()
-
+          compare_throughput_time_of_activites()
 
 
         }else if(input$funcPlot == "compare_throughput_time_of_activites"){
             #grViz( show_batching_in_process_map())
-            compare_throughput_time_of_activites()
+          compare_processing_time_of_activites()
+
 
 
 
@@ -309,7 +309,7 @@ return(        paste("With a throughput time of: ", paste( round(resList[[1]],3)
         #take string and add processtime
         resList <-         create_recommendations(get_metric_stats(compare_idle_time(bplot = FALSE)))
 
-return( paste("With a idle time of: ", paste( round(resList[[1]],3), paste(" +++days+++ and a Batch type of: ", paste(resList[2], paste(" , the idle time would be improved by ", paste(resList[3],paste("percent (compared to avg time of using only other Behaviour)")))) )))
+return( paste("With a case waiting time of: ", paste( round(resList[[1]],3), paste(" +++days+++ and a Batch type of: ", paste(resList[2], paste(" , the idle time would be improved by ", paste(resList[3],paste("percent (compared to avg time of using only other Behaviour)")))) )))
 )
 
     })

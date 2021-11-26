@@ -325,11 +325,11 @@ compare_throughput_time_of_activites <- function(){
 
   res_with_throughput_Time <- result_log
 
-  res_with_throughput_Time$Throughput_time = result_log$complete - result_log$start
+  res_with_throughput_Time$processing_time_in_min = result_log$complete - result_log$start
 
   res_with_throughput_Time$batch_type[is.na(res_with_throughput_Time$batch_type)] <- "no batching"
 
-   return(ggplot(data = res_with_throughput_Time, aes(x=activity, y=Throughput_time)) + geom_boxplot(aes(fill=batch_type)))
+   return(ggplot(data = res_with_throughput_Time, aes(x=activity, y=processing_time_in_min)) + geom_boxplot(aes(fill=batch_type)))
 
 }
 
@@ -342,7 +342,7 @@ compare_throughput_time_of_activites <- function(){
 #' @examples
 compare_processing_time <- function(bplot = TRUE){
 
-  #processing time
+  #processing time in days
 
   sim <- elogSim %>%
     processing_time("log")
@@ -362,7 +362,7 @@ compare_processing_time <- function(bplot = TRUE){
 
   #TODO
   #add noBatch maybe generic approach if elogs without vals
-  boxplot(sim, seq, conc,noBatch ,xlab = "batch type", ylab = "processing Time", names = c("parallel", "sequential", "concurrent", "noBatch"), plot = bplot )
+  boxplot(sim, seq, conc,noBatch ,xlab = "batch type", ylab = "processing Time in days", names = c("parallel", "sequential", "concurrent", "noBatch"), plot = bplot )
 
 
   #find type with nrow = null und als print unter graph sagen das dieses verhalten nicht vorhanden ist
@@ -397,7 +397,7 @@ compare_idle_time <- function(bplot = TRUE){
 
 
 
-  boxplot(sim, seq, conc, noBatch,xlab = "batch type", ylab = "idle Time", names = c("parallel", "sequential", "concurrent", "noBatch") , plot = bplot )
+  boxplot(sim, seq, conc, noBatch,xlab = "batch type", ylab = "Case Waiting Time in days", names = c("parallel", "sequential", "concurrent", "noBatch") , plot = bplot )
 
 }
 
@@ -445,7 +445,7 @@ compare_throughput_time <- function(bplot = TRUE){
 
   noBatch <- elogNoBatch %>%  throughput_time("log")
 
-  boxplot(sim, seq, conc,noBatch, xlab = "batch type", ylab = "Throughput Time", names = c("parallel", "sequential", "concurrent","noBatch"), plot = bplot  )
+  boxplot(sim, seq, conc,noBatch, xlab = "batch type", ylab = "Throughput Time in days", names = c("parallel", "sequential", "concurrent","noBatch"), plot = bplot  )
 
 }
 
