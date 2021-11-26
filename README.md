@@ -9,6 +9,8 @@
 The goal of batch analytics is to provide functions that represent
 metrics for analysing batching behaviour. To this end, a web application for interactive analysis with Visualisations is implemented with the shiny library. Furthermore recommendations for an optimal batch behaviour can be given through the package or the webapp.
 
+Web app can be found under batchanalytics/seperate_testing_folder/interactiveBatchAnalytics/
+
 
 
 
